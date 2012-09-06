@@ -1,0 +1,52 @@
+# This is a simple Makefile under Windows using cl.exe and link.exe
+# By Late Lee Copyleft 2011 2012
+# note
+# 1. you should make sure cl.exe and link.exe in your $PATH
+# usage
+# dos:\nmake -f Makefile_win32  (using -f to specify the Makefile)
+# dos:\nmake    (if your Makefile is just "Makefile")
+
+# !!!=== your executable file
+TARGET = a.exe
+CC = cl.exe
+LINK = link.exe
+RM = del
+
+# /MDd 
+# /I*your-inc-dir*
+CFLAGS = /nologo /D "WIN32" /Od /c /Tp
+CPPFLAGS = /nologo /D "WIN32" /Od /c
+LDFLAGS = /nologo
+
+# /NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:msvcrt.lib /NODEFAULTLIB:libcd.lib /NODEFAULTLIB:libcmtd.lib /NODEFAULTLIB:msvcrtd.lib
+# LDFLAGS = /NODEFAULTLIB:library
+
+# !!!===your c source file
+SRCS_C   = main.c
+# !!!===your c++ source file
+SRCS_CXX = 
+
+OBJS_C   = $(SRCS_C:.c=.obj)
+OBJS_CXX = $(SRCS_CXX:.cpp=.obj)
+
+!MESSAGE begin....
+all: clean $(TARGET)
+#	@$(RM) *.obj
+	@echo "Done."
+$(TARGET): $(OBJS_C) $(OBJS_CXX)
+#	$(CC) $(CFLAGS) $(OBJS) -o $@
+	$(LINK) $** $(LDFLAGS) /OUT:$@
+
+# compile .c as .cpp
+.c.obj::
+	$(CC)  $(CFLAGS) $<
+.cpp.obj::
+	$(CC) $(CPPFLAGS) $<
+#$(OBJS): $(SRCS)
+#	$(CC) -c $**
+clean:
+	@echo "Cleaning..."
+	$(RM) $(TARGET) *.obj
+	@echo "Done."
+
+.PHONY: clean  fuck all the world
