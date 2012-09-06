@@ -2,8 +2,6 @@
 #include <string.h>
 #include "cread_line.h"
 
-static char console_buffer[CB_SIZE + 1];
-
 #ifndef SIMPLE_READLINE
 
 static int hist_max = 0;
@@ -13,8 +11,6 @@ unsigned int hist_num = 0;
 
 static char* hist_list[HIST_MAX];
 static char hist_lines[HIST_MAX][HIST_SIZE + 1];	 /* Save room for NULL */
-
-//#define add_idx_minus_one() ((hist_add_idx == 0) ? hist_max : hist_add_idx-1)
 
 static void hist_init(void)
 {
@@ -95,7 +91,7 @@ int mygetch();
 #define getcmd_getch()      mygetch()
 #define getcmd_putch(ch)    putchar(ch)
 #define getcmd_cbeep()
-//#define getcmd_cbeep()        getcmd_putch('\a')
+//#define getcmd_cbeep()      getcmd_putch('\a')
 #define getcmd_printf       printf
 #define getcmd_puts         puts
 
@@ -107,8 +103,8 @@ int mygetch();
 #define BACKSPACE           ((char)8)
 #define CREAD_HIST_CHAR     ('!')
 
-#define putnstr(str,n)    do {      \
-    getcmd_printf ("%.*s", (int)n, str);    \
+#define putnstr(str,n)    do {          \
+    getcmd_printf ("%.*s", (int)n, str);\
 } while (0)
 
 #define BEGINNING_OF_LINE() {       \
@@ -127,8 +123,9 @@ int mygetch();
     }                                        \
 }
 
-#define ERASE_TO_CUR() {                     \
-    cur_num = num;  \
+// TODO
+#define ERASE_TO_CUR() {            \
+    cur_num = num;                  \
     while (num) {                   \
     getcmd_putch(CTL_BACKSPACE);    \
     num--;                          \
@@ -150,27 +147,34 @@ static void cread_add_char(char ichar, int insert, unsigned long *num,
     unsigned long wlen;
 
     /* room ??? */
-    if (insert || *num == *eol_num) {
-        if (*eol_num > len - 1) {
+    if (insert || *num == *eol_num)
+    {
+        if (*eol_num > len - 1)
+        {
             getcmd_cbeep();
             return;
         }
         (*eol_num)++;
     }
 
-    if (insert) {
+    if (insert)
+    {
         wlen = *eol_num - *num;
-        if (wlen > 1) {
+        if (wlen > 1)
+        {
             memmove(&buf[*num+1], &buf[*num], wlen-1);
         }
 
         buf[*num] = ichar;
         putnstr(buf + *num, wlen);
         (*num)++;
-        while (--wlen) {
+        while (--wlen)
+        {
             getcmd_putch(CTL_BACKSPACE);
         }
-    } else {
+    }
+    else
+    {
         /* echo the character */
         wlen = 1;
         buf[*num] = ichar;
@@ -182,7 +186,8 @@ static void cread_add_char(char ichar, int insert, unsigned long *num,
 static void cread_add_str(char *str, int strsize, int insert, unsigned long *num,
                           unsigned long *eol_num, char *buf, unsigned long len)
 {
-    while (strsize--) {
+    while (strsize--)
+    {
         cread_add_char(*str, insert, num, eol_num, buf, len);
         str++;
     }
@@ -207,13 +212,15 @@ static int cread_line(const char *const prompt, char *buf, unsigned int *len)
     {
         ichar = getcmd_getch();
 
-        if ((ichar == '\n') || (ichar == '\r')) {
+        if ((ichar == '\n') || (ichar == '\r'))
+        {
             getcmd_putch('\n');
             break;
         }
 
          /*
-         * handle Windows arrow key.
+         * handle Windows arrow key, etc.
+         * note: arrow keys have two char, the first is 0xe0
          */
         if (ichar == 0xe0)
         {
@@ -245,6 +252,7 @@ static int cread_line(const char *const prompt, char *buf, unsigned int *len)
                 break;
             }
         }
+
         /*
          * handle standard linux xterm esc sequences for arrow key, etc.
          */
@@ -296,15 +304,19 @@ static int cread_line(const char *const prompt, char *buf, unsigned int *len)
                 continue;
             }
         }
+        /* End of linux arrow key */
 
         switch (ichar)
         {
         /* linux esc sequences */
         case 0x1b:
-            if (esc_len == 0) {
+            if (esc_len == 0)
+            {
                 esc_save[esc_len] = ichar;
                 esc_len = 1;
-            } else {
+            }
+            else
+            {
                 getcmd_puts("impossible condition #876\n");
                 esc_len = 0;
             }
@@ -317,21 +329,25 @@ static int cread_line(const char *const prompt, char *buf, unsigned int *len)
             *buf = '\0';    /* discard input */
             return (-1);
         case CTL_CH('f'):
-            if (num < eol_num) {
+            if (num < eol_num)
+            {
                 getcmd_putch(buf[num]);
                 num++;
             }
             break;
         case CTL_CH('b'):
-            if (num) {
+            if (num)
+            {
                 getcmd_putch(CTL_BACKSPACE);
                 num--;
             }
             break;
         case CTL_CH('d'):
-            if (num < eol_num) {
+            if (num < eol_num)
+            {
                 wlen = eol_num - num - 1;
-                if (wlen) {
+                if (wlen)
+                {
                     memmove(&buf[num], &buf[num+1], wlen);
                     putnstr(buf + num, wlen);
                 }
@@ -353,16 +369,15 @@ static int cread_line(const char *const prompt, char *buf, unsigned int *len)
             insert = !insert;
             break;
         case CTL_CH('x'):
+        case CTL_CH('u'):
             BEGINNING_OF_LINE();
             ERASE_TO_EOL();
-            break;
-        case CTL_CH('u'):
-            ERASE_TO_CUR();
             break;
         case DEL:
         case DEL7:
         case BACKSPACE:
-            if (num) {
+            if (num)
+            {
                 wlen = eol_num - num;
                 num--;
                 memmove(&buf[num], &buf[num+1], wlen);
@@ -387,7 +402,8 @@ static int cread_line(const char *const prompt, char *buf, unsigned int *len)
             else
                 hline = hist_next();
 
-            if (!hline) {
+            if (!hline)
+            {
                 getcmd_cbeep();
                 continue;
             }
@@ -407,11 +423,13 @@ static int cread_line(const char *const prompt, char *buf, unsigned int *len)
         }
 // TODO
 #ifdef CONFIG_AUTO_COMPLETE
-        case '\t': {
+        case '\t': 
+        {
             int num2, col;
 
             /* do not autocomplete when in the middle */
-            if (num < eol_num) {
+            if (num < eol_num)
+            {
                 getcmd_cbeep();
                 break;
             }
@@ -419,7 +437,8 @@ static int cread_line(const char *const prompt, char *buf, unsigned int *len)
             buf[num] = '\0';
             col = strlen(prompt) + eol_num;
             num2 = num;
-            if (cmd_auto_complete(prompt, buf, &num2, &col)) {
+            if (cmd_auto_complete(prompt, buf, &num2, &col))
+            {
                 col = num2 - num;
                 num += col;
                 eol_num += col;
@@ -450,7 +469,8 @@ int readline_into_buffer (const char *const prompt, char* buffer)
     int rc;
     static int initted = 0;
 
-    if (!initted) {
+    if (!initted)
+    {
         hist_init();
         initted = 1;
     }
@@ -462,6 +482,7 @@ int readline_into_buffer (const char *const prompt, char* buffer)
     return rc < 0 ? rc : len;
 }
 
+/* implement of getch() */
 #ifdef WIN32
 #include <conio.h>
 
@@ -501,6 +522,7 @@ int mygetch(void)
 
 #else /* SIMPLE_READLINE */
 
+/* simple version, just call gets() */
 int readline_into_buffer_simple(const char *const prompt, char* buffer)
 {
     char* p = buffer;
@@ -518,9 +540,6 @@ int readline_into_buffer_simple(const char *const prompt, char* buffer)
 
 int readline (const char *const prompt, char* line_buf)
 {
-    // console_buffer[0] = '\0'
-    // return readline_into_buffer(prompt, console_buffer);
-
     line_buf[0] = '\0';
 
 #ifndef SIMPLE_READLINE 
@@ -529,4 +548,3 @@ int readline (const char *const prompt, char* line_buf)
     return readline_into_buffer_simple(prompt, line_buf);
 #endif
 }
-

@@ -14,7 +14,14 @@
 #include "command.h"
 #include "cread_line.h"
 
-///////////////////////////////////////////////////////
+/* just wrap the functions, in case that someone need implement them */
+#define cmd_puts    puts
+#define cmd_printf  printf
+#define cmd_putc    putc
+
+/**************************************************************************/
+
+/* just a foolish command table */
 cmd_tbl_t cmd_table[] = 
 {
     {"help", 10, do_help, "help info"},
@@ -24,6 +31,84 @@ cmd_tbl_t cmd_table[] =
     {"exit", 1, do_exit, "exit the program"},
     {NULL, 0, NULL, NULL},
 };
+
+cmd_tbl_t *find_cmd (const char* cmd);
+int cmd_usage(cmd_tbl_t *cmdtp);
+/*
+ * Use puts() instead of printf() to avoid printf buffer overflow
+ * for long help messages
+ */
+
+int _do_help (cmd_tbl_t *cmd_start, int cmd_items,
+	          int argc, char * const argv[])
+{
+	int i;
+	int rcode = 0;
+    cmd_tbl_t* cmdtp;
+
+	if (argc == 1)
+    {	/*show list of commands */
+		//cmd_tbl_t *cmd_array[cmd_items];
+		//int i, j, swaps;
+
+		///* Make array of commands from .uboot_cmd section */
+		//cmdtp = cmd_start;
+		//for (i = 0; i < cmd_items; i++)
+  //      {
+		//	cmd_array[i] = cmdtp++;
+		//}
+
+		///* Sort command list (trivial bubble sort) */
+		//for (i = cmd_items - 1; i > 0; --i)
+  //      {
+		//	swaps = 0;
+		//	for (j = 0; j < i; ++j)
+  //          {
+		//		if (strcmp (cmd_array[j]->name,
+		//			    cmd_array[j + 1]->name) > 0)
+  //              {
+		//			cmd_tbl_t *tmp;
+		//			tmp = cmd_array[j];
+		//			cmd_array[j] = cmd_array[j + 1];
+		//			cmd_array[j + 1] = tmp;
+		//			++swaps;
+		//		}
+		//	}
+		//	if (!swaps)
+		//		break;
+		//}
+
+		/* print short help (usage) */
+		for (i = 0; i < cmd_items; i++)
+        {
+			const char *usage = cmd_start[i].usage;
+
+			/* allow user abort */
+			//if (ctrlc ())
+			//	return 1;
+			if (usage == NULL)
+				continue;
+			printf("%-*s- %s\n", CONFIG_SYS_HELP_CMD_WIDTH,
+			       cmd_start[i].name, usage);
+		}
+		return 0;
+	}
+	/*
+	 * command help (long version)
+	 */
+	for (i = 1; i < argc; ++i) {
+		if ((cmdtp = find_cmd(argv[i])) != NULL) {
+			rcode |= cmd_usage(cmdtp);
+		} else {
+			printf ("Unknown command '%s' - try 'help'"
+				" without arguments for list of all"
+				" known commands\n\n", argv[i]
+					);
+			rcode = 1;
+		}
+	}
+	return rcode;
+}
 
 /***************************************************************************
  * find command table entry for a command
@@ -40,12 +125,15 @@ cmd_tbl_t *find_cmd_tbl (const char *cmd, cmd_tbl_t *table, int table_len)
 	 * Some commands allow length modifiers (like "cp.b");
 	 * compare command name only until first dot.
 	 */
-	len = ((p = strchr(cmd, '.')) == NULL) ? (int)strlen (cmd) : (int)(p - cmd);
+	//len = ((p = strchr(cmd, '.')) == NULL) ? (int)strlen (cmd) : (int)(p - cmd);
+    len = (int)strlen(cmd);
 
 	for (cmdtp = table;
 	     cmdtp != table + table_len;
-	     cmdtp++) {
-		if (strncmp (cmd, cmdtp->name, len) == 0) {
+	     cmdtp++)
+    {
+		if (strncmp (cmd, cmdtp->name, len) == 0)
+        {
 			if (len == strlen (cmdtp->name))
 				return cmdtp;	/* full match */
 
@@ -53,12 +141,14 @@ cmd_tbl_t *find_cmd_tbl (const char *cmd, cmd_tbl_t *table, int table_len)
 			n_found++;
 		}
 	}
-	if (n_found == 1) {			/* exactly one match */
+	if (n_found == 1)
+    {			/* exactly one match */
 		return cmdtp_temp;
 	}
 
 	return NULL;	/* not found or ambiguous command */
 }
+
 cmd_tbl_t* find_cmd_tbl2(const char* cmd, cmd_tbl_t *table)
 {
     const char *p;
@@ -69,21 +159,26 @@ cmd_tbl_t* find_cmd_tbl2(const char* cmd, cmd_tbl_t *table)
     longest = 0;
     nmatches = 0;
     found = 0;
-    for (c = table; (p = c->name) != NULL; c++) {
+    for (c = table; (p = c->name) != NULL; c++)
+    {
         for (q = cmd; *q == *p++; q++)
             if (*q == 0)		/* exact match? */
                 return (c);
-        if (!*q) {			/* the name was a prefix */
-            if (q - cmd > longest) {
+        if (!*q)
+        {			/* the name was a prefix */
+            if (q - cmd > longest)
+            {
                 longest = q - cmd;
                 nmatches = 1;
                 found = c;
-            } else if (q - cmd == longest)
+            }
+            else if (q - cmd == longest)
                 nmatches++;
         }
     }
     if (nmatches > 1)
         return NULL;
+
     return (found);
 }
 
@@ -122,18 +217,19 @@ cmd_tbl_t *find_cmd (const char* cmd)
 
 int cmd_usage(cmd_tbl_t *cmdtp)
 {
-    printf("%s - %s\n\n", cmdtp->name, cmdtp->usage);
+    cmd_printf("%s - %s\n\n", cmdtp->name, cmdtp->usage);
 
 #ifdef	CONFIG_SYS_LONGHELP
-    printf("Usage:\n%s ", cmdtp->name);
+    cmd_printf("Usage:\n%s ", cmdtp->name);
 
-    if (!cmdtp->help) {
-        puts ("- No additional help available.\n");
+    if (!cmdtp->help)
+    {
+        cmd_puts ("- No additional help available.\n");
         return 1;
     }
 
-    puts (cmdtp->help);
-    putc ('\n');
+    cmd_puts (cmdtp->help);
+    cmd_putc ('\n');
 #endif	/* CONFIG_SYS_LONGHELP */
     return 1;
 }
@@ -143,19 +239,21 @@ int parse_line (char *line, char *argv[])
     int nargs = 0;
 
 #ifdef DEBUG_PARSER
-    printf ("parse_line: \"%s\"\n", line);
+    cmd_printf ("parse_line: \"%s\"\n", line);
 #endif
-    while (nargs < CONFIG_SYS_MAXARGS) {
-
+    while (nargs < CONFIG_SYS_MAXARGS)
+    {
         /* skip any white space */
-        while ((*line == ' ') || (*line == '\t')) {
+        while ((*line == ' ') || (*line == '\t'))
+        {
             ++line;
         }
 
-        if (*line == '\0') {	/* end of line, no more args	*/
+        if (*line == '\0')
+        {	/* end of line, no more args	*/
             argv[nargs] = NULL;
 #ifdef DEBUG_PARSER
-            printf ("parse_line: nargs=%d\n", nargs);
+            cmd_printf ("parse_line: nargs=%d\n", nargs);
 #endif
             return (nargs);
         }
@@ -163,14 +261,16 @@ int parse_line (char *line, char *argv[])
         argv[nargs++] = line;	/* begin of argument string	*/
 
         /* find end of string */
-        while (*line && (*line != ' ') && (*line != '\t')) {
+        while (*line && (*line != ' ') && (*line != '\t'))
+        {
             ++line;
         }
 
-        if (*line == '\0') {	/* end of line, no more args	*/
+        if (*line == '\0')
+        {	/* end of line, no more args	*/
             argv[nargs] = NULL;
 #ifdef DEBUG_PARSER
-            printf ("parse_line: nargs=%d\n", nargs);
+            cmd_printf ("parse_line: nargs=%d\n", nargs);
 #endif
             return (nargs);
         }
@@ -178,10 +278,10 @@ int parse_line (char *line, char *argv[])
         *line++ = '\0';		/* terminate current arg	 */
     }
 
-    printf ("** Too many args (max. %d) **\n", CONFIG_SYS_MAXARGS);
+    cmd_printf ("** Too many args (max. %d) **\n", CONFIG_SYS_MAXARGS);
 
 #ifdef DEBUG_PARSER
-    printf ("parse_line: nargs=%d\n", nargs);
+    cmd_printf ("parse_line: nargs=%d\n", nargs);
 #endif
     return (nargs);
 }
@@ -200,19 +300,21 @@ int run_command (const char *cmd)
 	int rc = 0;
 
 #ifdef DEBUG_PARSER
-	printf ("[RUN_COMMAND] cmd[%p]=\"", cmd);
-	puts (cmd ? cmd : "NULL");	/* use puts - string may be loooong */
-	puts ("\"\n");
+	cmd_printf ("[RUN_COMMAND] cmd[%p]=\"", cmd);
+	cmd_puts (cmd ? cmd : "NULL");	/* use puts - string may be loooong */
+	cmd_puts ("\"\n");
 #endif
 
 	//clear_ctrlc();		/* forget any previous Control C */
 
-	if (!cmd || !*cmd) {
+	if (!cmd || !*cmd)
+    {
 		return -1;	/* empty command */
 	}
 
-	if (strlen(cmd) >= CB_SIZE) {
-		puts ("## Command too long!\n");
+	if (strlen(cmd) >= CB_SIZE)
+    {
+		cmd_puts ("## Command too long!\n");
 		return -1;
 	}
 
@@ -223,7 +325,7 @@ int run_command (const char *cmd)
 	 */
 
 #ifdef DEBUG_PARSER
-	printf ("[PROCESS_SEPARATORS] %s\n", cmd);
+	cmd_printf ("[PROCESS_SEPARATORS] %s\n", cmd);
 #endif
 	while (*str) {
 
@@ -231,7 +333,8 @@ int run_command (const char *cmd)
 		 * Find separator, or string end
 		 * Allow simple escape of ';' by writing "\;"
 		 */
-		for (inquotes = 0, sep = str; *sep; sep++) {
+		for (inquotes = 0, sep = str; *sep; sep++)
+        {
 			if ((*sep=='\'') &&
 			    (*(sep-1) != '\\'))
 				inquotes=!inquotes;
@@ -247,38 +350,43 @@ int run_command (const char *cmd)
 		 * Limit the token to data between separators
 		 */
 		token = str;
-		if (*sep) {
+		if (*sep)
+        {
 			str = sep + 1;	/* start of command for next pass */
 			*sep = '\0';
 		}
 		else
 			str = sep;	/* no more commands for next pass */
 #ifdef DEBUG_PARSER
-		printf ("token: \"%s\"\n", token);
+		cmd_printf ("token: \"%s\"\n", token);
 #endif
 
 		/* Extract arguments */
-		if ((argc = parse_line (token, argv)) == 0) {
+		if ((argc = parse_line (token, argv)) == 0)
+        {
 			rc = -1;	/* no command at all */
 			continue;
 		}
 
 		/* Look up command in command table */
-		if ((cmdtp = find_cmd(argv[0])) == NULL) {
-			printf ("Unknown command '%s' - try 'help'\n", argv[0]);
+		if ((cmdtp = find_cmd(argv[0])) == NULL)
+        {
+			cmd_printf ("Unknown command '%s' - try 'help'\n", argv[0]);
 			rc = -1;	/* give up after bad command */
 			continue;
 		}
 
 		/* found - check max args */
-		if (argc > cmdtp->maxargs) {
+		if (argc > cmdtp->maxargs)
+        {
 			cmd_usage(cmdtp);
 			rc = -1;
 			continue;
 		}
 
 		/* OK - call function to do the command */
-		if ((cmdtp->cmd) (argc, argv) != 0) {
+		if ((cmdtp->cmd) (argc, argv) != 0)
+        {
 			rc = -1;
 		}
 
@@ -294,10 +402,10 @@ int run_command (const char *cmd)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
+
 int do_help(int argc, char * const argv[])
 {
-    printf("help...\n");
-
+    _do_help(&cmd_table, sizeof(cmd_table)/sizeof(cmd_tbl_t), argc, argv);
     return 0;
 }
 
