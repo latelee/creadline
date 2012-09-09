@@ -25,7 +25,8 @@
 
         其它：
         未完成功能：
-        Ctrl-u功能未完成 Ctrl-y功能未完成
+        Ctrl-u功能与readline库不相同
+        Ctrl-y功能未完成
 
 
         Delte键处理：
@@ -36,6 +37,10 @@
 
 #ifndef CREAD_LINE_H
 #define CREAD_LINE_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 //#define SIMPLE_READLINE   /* very simple one using gets() */
 
@@ -48,5 +53,9 @@
 #define HIST_SIZE		MAX_CMDBUF_SIZE
 
 int readline (const char *const prompt, char* line_buf);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif /* CREAD_LINE_H */

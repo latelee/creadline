@@ -21,19 +21,10 @@
 
 /**************************************************************************/
 
-/* just a foolish command table */
-cmd_tbl_t cmd_table[] = 
-{
-    {"help", 10, do_help, "help info"},
-    {"foo", 10, do_foo, "foo info"},
-    {"foobar", 10, do_bar, "bar info"},
-    {"test", 10, do_test, "test info"},
-    {"exit", 1, do_exit, "exit the program"},
-    {NULL, 0, NULL, NULL},
-};
-
 cmd_tbl_t *find_cmd (const char* cmd);
+
 int cmd_usage(cmd_tbl_t *cmdtp);
+
 /*
  * Use puts() instead of printf() to avoid printf buffer overflow
  * for long help messages
@@ -117,7 +108,7 @@ cmd_tbl_t *find_cmd_tbl (const char *cmd, cmd_tbl_t *table, int table_len)
 {
 	cmd_tbl_t *cmdtp;
 	cmd_tbl_t *cmdtp_temp = table;	/*Init value */
-	const char *p;
+	//const char *p;
 	int len;
 	int n_found = 0;
 
@@ -292,7 +283,7 @@ int run_command (const char *cmd)
 	char cmdbuf[CB_SIZE];	/* working copy of cmd		*/
 	char *token;			/* start of token in cmdbuf	*/
 	char *sep;			/* end of token (separator) in cmdbuf */
-	char finaltoken[CB_SIZE];
+	//char finaltoken[CB_SIZE];
 	char *str = cmdbuf;
 	char *argv[CONFIG_SYS_MAXARGS + 1];	/* NULL terminated	*/
 	int argc, inquotes;
@@ -399,53 +390,4 @@ int run_command (const char *cmd)
 
 	//return rc ? rc : repeatable;
     return rc;
-}
-
-///////////////////////////////////////////////////////////////////////////////////
-
-int do_help(int argc, char * const argv[])
-{
-    _do_help(&cmd_table, sizeof(cmd_table)/sizeof(cmd_tbl_t), argc, argv);
-    return 0;
-}
-
-int do_foo(int argc, char * const argv[])
-{
-    int i = 0;
-
-    printf("do_foo argc: %d\n", argc);
-    for (i = 0; i < argc; i++)
-    {
-        printf("argv[%d]: %s\n", i, argv[i]);
-    }
-    return 0;
-}
-
-int do_bar(int argc, char * const argv[])
-{
-    int i = 0;
-
-    printf("do_bar argc: %d\n", argc);
-    for (i = 0; i < argc; i++)
-    {
-        printf("argv[%d]: %s\n", i, argv[i]);
-    }
-    return 0;
-}
-
-int do_test(int argc, char * const argv[])
-{
-    int i = 0;
-
-    printf("do_test argc: %d\n", argc);
-    for (i = 0; i < argc; i++)
-    {
-        printf("argv[%d]: %s\n", i, argv[i]);
-    }
-    return 0;
-}
-
-int do_exit(int argc, char * const argv[])
-{
-    exit(0);
 }
