@@ -4,6 +4,8 @@
 
 #ifndef SIMPLE_READLINE
 
+/* history command BEGIN */
+
 static int hist_max = 0;
 static int hist_add_idx = 0;
 static int hist_cur = -1;

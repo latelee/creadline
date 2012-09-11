@@ -48,7 +48,7 @@ extern "C" {
 #define CB_SIZE         256 /* console buffer size */
 #define MAX_CMDBUF_SIZE CB_SIZE
 
-/* history command BEGIN */
+/* history command */
 #define HIST_MAX		10
 #define HIST_SIZE		MAX_CMDBUF_SIZE
 
