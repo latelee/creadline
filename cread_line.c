@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "cread_line.h"
+#include "common.h"
 
 #ifndef SIMPLE_READLINE
 
@@ -87,15 +88,12 @@ static char* hist_next(void)
 
 /* history command END */
 
-// note: getch(), not getchar()
-int mygetch();
-
-#define getcmd_getch()      mygetch()
-#define getcmd_putch(ch)    putchar(ch)
+#define getcmd_getch()      mygetc()
+#define getcmd_putch(ch)    myputc(ch)
 #define getcmd_cbeep()
 //#define getcmd_cbeep()      getcmd_putch('\a')
-#define getcmd_printf       printf
-#define getcmd_puts         puts
+#define getcmd_printf       myprintf
+#define getcmd_puts         myputs
 
 #define CTL_CH(c)           ((c) - 'a' + 1)
 
@@ -483,44 +481,6 @@ int readline_into_buffer (const char *const prompt, char* buffer)
     rc = cread_line(prompt, p, &len);
     return rc < 0 ? rc : len;
 }
-
-/* implement of getch() */
-#ifdef WIN32
-#include <conio.h>
-
-int mygetch(void)
-{
-    return getch();
-}
-
-#else
-
-#include <termios.h> /* for tcxxxattr, ECHO, etc */
-#include <unistd.h> /* for STDIN_FILENO */
-
-/*simulate windows' getch(), it works!!*/
-int mygetch(void)
-{
-    int ch;
-    struct termios oldt, newt;
-
-    // get terminal input's attribute
-    tcgetattr(STDIN_FILENO, &oldt);
-    newt = oldt;
-
-    //set termios' local mode
-    newt.c_lflag &= ~(ECHO|ICANON);
-    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-
-    //read character from terminal input
-    ch = getchar();
-
-    //recover terminal's attribute
-    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-
-    return ch;
-}
-#endif
 
 #else /* SIMPLE_READLINE */
 

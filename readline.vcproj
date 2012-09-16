@@ -116,6 +116,9 @@
 				RelativePath=".\command.c">
 			</File>
 			<File
+				RelativePath=".\console.c">
+			</File>
+			<File
 				RelativePath=".\cread_line.c">
 			</File>
 			<File
@@ -124,6 +127,9 @@
 			<File
 				RelativePath=".\my_command.c">
 			</File>
+			<File
+				RelativePath=".\vsprintf.c">
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -131,6 +137,9 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
 				RelativePath=".\command.h">
+			</File>
+			<File
+				RelativePath=".\common.h">
 			</File>
 			<File
 				RelativePath=".\cread_line.h">

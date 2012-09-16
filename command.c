@@ -13,11 +13,12 @@
 #include <string.h>
 #include "command.h"
 #include "cread_line.h"
+#include "common.h"
 
 /* just wrap the functions, in case that someone need implement them */
-#define cmd_puts    puts
-#define cmd_printf  printf
-#define cmd_putc    putc
+#define cmd_puts    myputs
+#define cmd_printf  myprintf
+#define cmd_putc    myputc
 
 /**************************************************************************/
 
@@ -79,7 +80,7 @@ int _do_help (cmd_tbl_t *cmd_start, int cmd_items,
 			//	return 1;
 			if (usage == NULL)
 				continue;
-			printf("%-*s- %s\n", CONFIG_SYS_HELP_CMD_WIDTH,
+			cmd_printf("%-*s- %s\n", CONFIG_SYS_HELP_CMD_WIDTH,
 			       cmd_start[i].name, usage);
 		}
 		return 0;
@@ -91,7 +92,7 @@ int _do_help (cmd_tbl_t *cmd_start, int cmd_items,
 		if ((cmdtp = find_cmd(argv[i])) != NULL) {
 			rcode |= cmd_usage(cmdtp);
 		} else {
-			printf ("Unknown command '%s' - try 'help'"
+			cmd_printf ("Unknown command '%s' - try 'help'"
 				" without arguments for list of all"
 				" known commands\n\n", argv[i]
 					);

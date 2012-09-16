@@ -1,14 +1,52 @@
 #include <stdio.h>
 #include <string.h>
-
+#ifdef WIN32
+#include <windows.h>
+#endif
 #include "cread_line.h"
 #include "command.h"
+
+#define mysleep Sleep
+
+int abortboot(int delay)
+{
+    int abort = 0;
+    int i = 0;
+
+    myprintf("Hit any key to stop autoboot: %2d ", delay);
+
+    while ((delay > 0) && (!abort))
+    {
+        --delay;
+        for (i = 0; !abort && i < 100; ++i)
+        {
+            if (mytstc())
+            {
+                abort = 1;
+                delay = 0;
+                mygetc();
+                break;
+            }
+            mysleep(10);
+        }
+        myprintf("\b\b\b%2d ", delay);
+    }
+    myputc('\n');
+
+    return abort;
+}
 
 int readline_test(void)
 {
     static char lastcommand[CB_SIZE] = {0};
     int len;
 
+    if (!abortboot(5))
+    {
+        myprintf("Aotu run.\n");
+        return 0;
+    }
+    myprintf("You abort.\n");
     while (1)
     {
         len = readline(PROMPT, lastcommand);
@@ -17,7 +55,7 @@ int readline_test(void)
             //printf("len: %d\n", len);
             if (len > CB_SIZE)
             {
-                printf("command line too large.\n");
+                myprintf("command line too large.\n");
                 break;
             }
             //strcpy(lastcommand, console_buffer);
@@ -32,7 +70,7 @@ int readline_test(void)
 
         if (len == -1)
         {
-            puts("<INTERRUPT>");
+            myputs("<INTERRUPT>\n");
         }
         else
         {
@@ -43,10 +81,25 @@ int readline_test(void)
     return 0;
 }
 
+// 回退键测试
+// 注：必须回退到适应位置
+void test()
+{
+    int cnt = 0;
+    printf("time:%2d%% ", cnt);
+    while(1)
+    {
+        printf("\b\b\b\b%2d%% ", cnt++);
+        if (cnt == 100)
+            break;
+        Sleep(1000);
+    }
 
+}
 int main(void)
 {
-    readline_test();
-
+    test();
+    //readline_test();
+    //myputs("hello world.\r");
     return 0;
 }
