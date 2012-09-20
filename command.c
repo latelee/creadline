@@ -32,74 +32,74 @@ int cmd_usage(cmd_tbl_t *cmdtp);
  */
 
 int _do_help (cmd_tbl_t *cmd_start, int cmd_items,
-	          int argc, char * const argv[])
+              int argc, char * const argv[])
 {
-	int i;
-	int rcode = 0;
+    int i;
+    int rcode = 0;
     cmd_tbl_t* cmdtp;
 
-	if (argc == 1)
-    {	/*show list of commands */
-		//cmd_tbl_t *cmd_array[cmd_items];
-		//int i, j, swaps;
+    if (argc == 1)
+    {    /*show list of commands */
+        //cmd_tbl_t *cmd_array[cmd_items];
+        //int i, j, swaps;
 
-		///* Make array of commands from .uboot_cmd section */
-		//cmdtp = cmd_start;
-		//for (i = 0; i < cmd_items; i++)
+        ///* Make array of commands from .uboot_cmd section */
+        //cmdtp = cmd_start;
+        //for (i = 0; i < cmd_items; i++)
   //      {
-		//	cmd_array[i] = cmdtp++;
-		//}
+        //    cmd_array[i] = cmdtp++;
+        //}
 
-		///* Sort command list (trivial bubble sort) */
-		//for (i = cmd_items - 1; i > 0; --i)
+        ///* Sort command list (trivial bubble sort) */
+        //for (i = cmd_items - 1; i > 0; --i)
   //      {
-		//	swaps = 0;
-		//	for (j = 0; j < i; ++j)
+        //    swaps = 0;
+        //    for (j = 0; j < i; ++j)
   //          {
-		//		if (strcmp (cmd_array[j]->name,
-		//			    cmd_array[j + 1]->name) > 0)
+        //        if (strcmp (cmd_array[j]->name,
+        //                cmd_array[j + 1]->name) > 0)
   //              {
-		//			cmd_tbl_t *tmp;
-		//			tmp = cmd_array[j];
-		//			cmd_array[j] = cmd_array[j + 1];
-		//			cmd_array[j + 1] = tmp;
-		//			++swaps;
-		//		}
-		//	}
-		//	if (!swaps)
-		//		break;
-		//}
+        //            cmd_tbl_t *tmp;
+        //            tmp = cmd_array[j];
+        //            cmd_array[j] = cmd_array[j + 1];
+        //            cmd_array[j + 1] = tmp;
+        //            ++swaps;
+        //        }
+        //    }
+        //    if (!swaps)
+        //        break;
+        //}
 
-		/* print short help (usage) */
-		for (i = 0; i < cmd_items; i++)
+        /* print short help (usage) */
+        for (i = 0; i < cmd_items; i++)
         {
-			const char *usage = cmd_start[i].usage;
+            const char *usage = cmd_start[i].usage;
 
-			/* allow user abort */
-			//if (ctrlc ())
-			//	return 1;
-			if (usage == NULL)
-				continue;
-			cmd_printf("%-*s- %s\n", CONFIG_SYS_HELP_CMD_WIDTH,
-			       cmd_start[i].name, usage);
-		}
-		return 0;
-	}
-	/*
-	 * command help (long version)
-	 */
-	for (i = 1; i < argc; ++i) {
-		if ((cmdtp = find_cmd(argv[i])) != NULL) {
-			rcode |= cmd_usage(cmdtp);
-		} else {
-			cmd_printf ("Unknown command '%s' - try 'help'"
-				" without arguments for list of all"
-				" known commands\n\n", argv[i]
-					);
-			rcode = 1;
-		}
-	}
-	return rcode;
+            /* allow user abort */
+            //if (ctrlc ())
+            //    return 1;
+            if (usage == NULL)
+                continue;
+            cmd_printf("%-*s- %s\n", CONFIG_SYS_HELP_CMD_WIDTH,
+                   cmd_start[i].name, usage);
+        }
+        return 0;
+    }
+    /*
+     * command help (long version)
+     */
+    for (i = 1; i < argc; ++i) {
+        if ((cmdtp = find_cmd(argv[i])) != NULL) {
+            rcode |= cmd_usage(cmdtp);
+        } else {
+            cmd_printf ("Unknown command '%s' - try 'help'"
+                " without arguments for list of all"
+                " known commands\n\n", argv[i]
+                    );
+            rcode = 1;
+        }
+    }
+    return rcode;
 }
 
 /***************************************************************************
@@ -107,38 +107,38 @@ int _do_help (cmd_tbl_t *cmd_start, int cmd_items,
  */
 cmd_tbl_t *find_cmd_tbl (const char *cmd, cmd_tbl_t *table, int table_len)
 {
-	cmd_tbl_t *cmdtp;
-	cmd_tbl_t *cmdtp_temp = table;	/*Init value */
-	//const char *p;
-	int len;
-	int n_found = 0;
+    cmd_tbl_t *cmdtp;
+    cmd_tbl_t *cmdtp_temp = table;    /*Init value */
+    //const char *p;
+    int len;
+    int n_found = 0;
 
-	/*
-	 * Some commands allow length modifiers (like "cp.b");
-	 * compare command name only until first dot.
-	 */
-	//len = ((p = strchr(cmd, '.')) == NULL) ? (int)strlen (cmd) : (int)(p - cmd);
+    /*
+     * Some commands allow length modifiers (like "cp.b");
+     * compare command name only until first dot.
+     */
+    //len = ((p = strchr(cmd, '.')) == NULL) ? (int)strlen (cmd) : (int)(p - cmd);
     len = (int)strlen(cmd);
 
-	for (cmdtp = table;
-	     cmdtp != table + table_len;
-	     cmdtp++)
+    for (cmdtp = table;
+         cmdtp != table + table_len;
+         cmdtp++)
     {
-		if (strncmp (cmd, cmdtp->name, len) == 0)
+        if (strncmp (cmd, cmdtp->name, len) == 0)
         {
-			if (len == strlen (cmdtp->name))
-				return cmdtp;	/* full match */
+            if (len == strlen (cmdtp->name))
+                return cmdtp;    /* full match */
 
-			cmdtp_temp = cmdtp;	/* abbreviated command ? */
-			n_found++;
-		}
-	}
-	if (n_found == 1)
-    {			/* exactly one match */
-		return cmdtp_temp;
-	}
+            cmdtp_temp = cmdtp;    /* abbreviated command ? */
+            n_found++;
+        }
+    }
+    if (n_found == 1)
+    {            /* exactly one match */
+        return cmdtp_temp;
+    }
 
-	return NULL;	/* not found or ambiguous command */
+    return NULL;    /* not found or ambiguous command */
 }
 
 cmd_tbl_t* find_cmd_tbl2(const char* cmd, cmd_tbl_t *table)
@@ -154,10 +154,10 @@ cmd_tbl_t* find_cmd_tbl2(const char* cmd, cmd_tbl_t *table)
     for (c = table; (p = c->name) != NULL; c++)
     {
         for (q = cmd; *q == *p++; q++)
-            if (*q == 0)		/* exact match? */
+            if (*q == 0)        /* exact match? */
                 return (c);
         if (!*q)
-        {			/* the name was a prefix */
+        {            /* the name was a prefix */
             if (q - cmd > longest)
             {
                 longest = q - cmd;
@@ -188,7 +188,7 @@ cmd_tbl_t* find_cmd_tbl3(const char* cmd, cmd_tbl_t *table)
     for (c = table; (p = c->name) != NULL; c++)
     {
         for (q = cmd; *q == *p++; q++)
-            if (*q == 0)		/* exact match? */
+            if (*q == 0)        /* exact match? */
                 return (c);
         if (!*q)
         {
@@ -211,7 +211,7 @@ int cmd_usage(cmd_tbl_t *cmdtp)
 {
     cmd_printf("%s - %s\n\n", cmdtp->name, cmdtp->usage);
 
-#ifdef	CONFIG_SYS_LONGHELP
+#ifdef    CONFIG_SYS_LONGHELP
     cmd_printf("Usage:\n%s ", cmdtp->name);
 
     if (!cmdtp->help)
@@ -222,7 +222,7 @@ int cmd_usage(cmd_tbl_t *cmdtp)
 
     cmd_puts (cmdtp->help);
     cmd_putc ('\n');
-#endif	/* CONFIG_SYS_LONGHELP */
+#endif    /* CONFIG_SYS_LONGHELP */
     return 1;
 }
 
@@ -242,7 +242,7 @@ int parse_line (char *line, char *argv[])
         }
 
         if (*line == '\0')
-        {	/* end of line, no more args	*/
+        {    /* end of line, no more args    */
             argv[nargs] = NULL;
 #ifdef DEBUG_PARSER
             cmd_printf ("parse_line: nargs=%d\n", nargs);
@@ -250,7 +250,7 @@ int parse_line (char *line, char *argv[])
             return (nargs);
         }
 
-        argv[nargs++] = line;	/* begin of argument string	*/
+        argv[nargs++] = line;    /* begin of argument string    */
 
         /* find end of string */
         while (*line && (*line != ' ') && (*line != '\t'))
@@ -259,7 +259,7 @@ int parse_line (char *line, char *argv[])
         }
 
         if (*line == '\0')
-        {	/* end of line, no more args	*/
+        {    /* end of line, no more args    */
             argv[nargs] = NULL;
 #ifdef DEBUG_PARSER
             cmd_printf ("parse_line: nargs=%d\n", nargs);
@@ -267,7 +267,7 @@ int parse_line (char *line, char *argv[])
             return (nargs);
         }
 
-        *line++ = '\0';		/* terminate current arg	 */
+        *line++ = '\0';        /* terminate current arg     */
     }
 
     cmd_printf ("** Too many args (max. %d) **\n", CONFIG_SYS_MAXARGS);
@@ -280,115 +280,115 @@ int parse_line (char *line, char *argv[])
 
 int run_command (const char *cmd)
 {
-	cmd_tbl_t *cmdtp;
-	char cmdbuf[CB_SIZE];	/* working copy of cmd		*/
-	char *token;			/* start of token in cmdbuf	*/
-	char *sep;			/* end of token (separator) in cmdbuf */
-	//char finaltoken[CB_SIZE];
-	char *str = cmdbuf;
-	char *argv[CONFIG_SYS_MAXARGS + 1];	/* NULL terminated	*/
-	int argc, inquotes;
-	int repeatable = 1;
-	int rc = 0;
+    cmd_tbl_t *cmdtp;
+    char cmdbuf[CB_SIZE];    /* working copy of cmd        */
+    char *token;            /* start of token in cmdbuf    */
+    char *sep;            /* end of token (separator) in cmdbuf */
+    //char finaltoken[CB_SIZE];
+    char *str = cmdbuf;
+    char *argv[CONFIG_SYS_MAXARGS + 1];    /* NULL terminated    */
+    int argc, inquotes;
+    int repeatable = 1;
+    int rc = 0;
 
 #ifdef DEBUG_PARSER
-	cmd_printf ("[RUN_COMMAND] cmd[%p]=\"", cmd);
-	cmd_puts (cmd ? cmd : "NULL");	/* use puts - string may be loooong */
-	cmd_puts ("\"\n");
+    cmd_printf ("[RUN_COMMAND] cmd[%p]=\"", cmd);
+    cmd_puts (cmd ? cmd : "NULL");    /* use puts - string may be loooong */
+    cmd_puts ("\"\n");
 #endif
 
-	//clear_ctrlc();		/* forget any previous Control C */
+    //clear_ctrlc();        /* forget any previous Control C */
 
-	if (!cmd || !*cmd)
+    if (!cmd || !*cmd)
     {
-		return -1;	/* empty command */
-	}
+        return -1;    /* empty command */
+    }
 
-	if (strlen(cmd) >= CB_SIZE)
+    if (strlen(cmd) >= CB_SIZE)
     {
-		cmd_puts ("## Command too long!\n");
-		return -1;
-	}
+        cmd_puts ("## Command too long!\n");
+        return -1;
+    }
 
-	strcpy (cmdbuf, cmd);
+    strcpy (cmdbuf, cmd);
 
-	/* Process separators and check for invalid
-	 * repeatable commands
-	 */
+    /* Process separators and check for invalid
+     * repeatable commands
+     */
 
 #ifdef DEBUG_PARSER
-	cmd_printf ("[PROCESS_SEPARATORS] %s\n", cmd);
+    cmd_printf ("[PROCESS_SEPARATORS] %s\n", cmd);
 #endif
-	while (*str) {
+    while (*str) {
 
-		/*
-		 * Find separator, or string end
-		 * Allow simple escape of ';' by writing "\;"
-		 */
-		for (inquotes = 0, sep = str; *sep; sep++)
+        /*
+         * Find separator, or string end
+         * Allow simple escape of ';' by writing "\;"
+         */
+        for (inquotes = 0, sep = str; *sep; sep++)
         {
-			if ((*sep=='\'') &&
-			    (*(sep-1) != '\\'))
-				inquotes=!inquotes;
+            if ((*sep=='\'') &&
+                (*(sep-1) != '\\'))
+                inquotes=!inquotes;
 
-			if (!inquotes &&
-			    (*sep == ';') &&	/* separator		*/
-			    ( sep != str) &&	/* past string start	*/
-			    (*(sep-1) != '\\'))	/* and NOT escaped	*/
-				break;
-		}
+            if (!inquotes &&
+                (*sep == ';') &&    /* separator        */
+                ( sep != str) &&    /* past string start    */
+                (*(sep-1) != '\\'))    /* and NOT escaped    */
+                break;
+        }
 
-		/*
-		 * Limit the token to data between separators
-		 */
-		token = str;
-		if (*sep)
+        /*
+         * Limit the token to data between separators
+         */
+        token = str;
+        if (*sep)
         {
-			str = sep + 1;	/* start of command for next pass */
-			*sep = '\0';
-		}
-		else
-			str = sep;	/* no more commands for next pass */
+            str = sep + 1;    /* start of command for next pass */
+            *sep = '\0';
+        }
+        else
+            str = sep;    /* no more commands for next pass */
 #ifdef DEBUG_PARSER
-		cmd_printf ("token: \"%s\"\n", token);
+        cmd_printf ("token: \"%s\"\n", token);
 #endif
 
-		/* Extract arguments */
-		if ((argc = parse_line (token, argv)) == 0)
+        /* Extract arguments */
+        if ((argc = parse_line (token, argv)) == 0)
         {
-			rc = -1;	/* no command at all */
-			continue;
-		}
+            rc = -1;    /* no command at all */
+            continue;
+        }
 
-		/* Look up command in command table */
-		if ((cmdtp = find_cmd(argv[0])) == NULL)
+        /* Look up command in command table */
+        if ((cmdtp = find_cmd(argv[0])) == NULL)
         {
-			cmd_printf ("Unknown command '%s' - try 'help'\n", argv[0]);
-			rc = -1;	/* give up after bad command */
-			continue;
-		}
+            cmd_printf ("Unknown command '%s' - try 'help'\n", argv[0]);
+            rc = -1;    /* give up after bad command */
+            continue;
+        }
 
-		/* found - check max args */
-		if (argc > cmdtp->maxargs)
+        /* found - check max args */
+        if (argc > cmdtp->maxargs)
         {
-			cmd_usage(cmdtp);
-			rc = -1;
-			continue;
-		}
+            cmd_usage(cmdtp);
+            rc = -1;
+            continue;
+        }
 
-		/* OK - call function to do the command */
-		if ((cmdtp->cmd) (argc, argv) != 0)
+        /* OK - call function to do the command */
+        if ((cmdtp->cmd) (argc, argv) != 0)
         {
-			rc = -1;
-		}
+            rc = -1;
+        }
 
-		//repeatable &= cmdtp->repeatable;
+        //repeatable &= cmdtp->repeatable;
 
-		///* Did the user stop this? */
-		//if (had_ctrlc ())
-		//	return -1;	/* if stopped then not repeatable */
-	}
+        ///* Did the user stop this? */
+        //if (had_ctrlc ())
+        //    return -1;    /* if stopped then not repeatable */
+    }
 
-	//return rc ? rc : repeatable;
+    //return rc ? rc : repeatable;
     return rc;
 }

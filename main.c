@@ -13,7 +13,7 @@ int abortboot(int delay)
     int abort = 0;
     int i = 0;
 
-    myprintf("Hit any key to stop autoboot: %2d ", delay);
+    myprintf("Hit SPACE key to stop autoboot: %2d ", delay);
 
     while ((delay > 0) && (!abort))
     {
@@ -41,19 +41,20 @@ int readline_test(void)
     static char lastcommand[CB_SIZE] = {0};
     int len;
 
-    if (!abortboot(5))
-    {
-        myprintf("Aotu run.\n");
-        return 0;
-    }
-    myprintf("You abort.\n");
+    //if (!abortboot(5))
+    //{
+    //    myprintf("Aotu run.\n");
+    //    return 0;
+    //}
+    //myprintf("You abort.\n");
+
     while (1)
     {
         len = readline(PROMPT, lastcommand);
         if (len > 0)
         {
             //printf("len: %d\n", len);
-            if (len > CB_SIZE)
+            if (len >= CB_SIZE)
             {
                 myprintf("command line too large.\n");
                 break;
@@ -96,10 +97,48 @@ void test()
     }
 
 }
-int main(void)
+
+void test2()
 {
-    test();
-    //readline_test();
+    char *end;
+    int i;
+    char* addr = "40:5f:c2:a6:18:4b";
+    char* ip = "172.18.10.156";
+    unsigned char enetaddr[16];
+
+    for (i = 0; i < 6; ++i) {
+        enetaddr[i] = addr ? simple_strtoul(addr, &end, 16) : 0;
+        if (addr)
+            addr = (*end) ? end + 1 : end;
+    }
+    enetaddr[i] = '\0';
+
+    for (i = 0; i < 6; ++i)
+    {
+        printf("%x ", enetaddr[i]);
+    }
+
+    for (i = 0; i < 4; ++i) {
+        enetaddr[i] = ip ? simple_strtoul(ip, &end, 10) : 0;
+        if (ip)
+            ip = (*end) ? end + 1 : end;
+    }
+    enetaddr[i] = '\0';
+    for (i = 0; i < 4; ++i)
+    {
+        printf("%d ", enetaddr[i]);
+    }
+
+    printf("\n");
+}
+
+int main(int argc, char* argv[])
+{
+    test2();
+    initIBL();
+    readline_test();
     //myputs("hello world.\r");
+    //myprintf("hello\n");
     return 0;
 }
+

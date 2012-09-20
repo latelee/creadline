@@ -52,6 +52,8 @@ extern int _do_help (cmd_tbl_t *cmd_start, int cmd_items,
 
 int run_command (const char* cmd);
 
+int run_command1(const char *cmd);
+
 #ifdef __cplusplus
 };
 #endif

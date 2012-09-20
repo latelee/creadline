@@ -75,21 +75,21 @@ void myputs(const char *s)
 // 缓冲区最大为512字节，如果打印信息超过此值，由系统处理，本函数不处理
 int myprintf(const char *fmt, ...)
 {
-	va_list args;
-	int i;
-	char printbuffer[512];
+    va_list args;
+    int i;
+    char printbuffer[512];
 
-	va_start(args, fmt);
+    va_start(args, fmt);
 
-	/* For this to work, printbuffer must be larger than
-	 * anything we ever want to print.
-	 */
-	i = myvsprintf(printbuffer, fmt, args);
-	va_end(args);
+    /* For this to work, printbuffer must be larger than
+     * anything we ever want to print.
+     */
+    i = myvsprintf(printbuffer, fmt, args);
+    va_end(args);
 
-	/* Print the string */
-	myputs(printbuffer);
-	return i;
+    /* Print the string */
+    myputs(printbuffer);
+    return i;
 }
 
 /**
@@ -105,32 +105,32 @@ int myprintf(const char *fmt, ...)
  */
 int mysprintf(char * buf, const char *fmt, ...)
 {
-	va_list args;
-	int i;
+    va_list args;
+    int i;
 
-	va_start(args, fmt);
-	i=vsprintf(buf,fmt,args);
-	va_end(args);
-	return i;
+    va_start(args, fmt);
+    i=myvsprintf(buf,fmt,args);
+    va_end(args);
+    return i;
 }
 
 /* test if ctrl-c was pressed */
-static int ctrlc_disabled = 0;	/* see disable_ctrl() */
+static int ctrlc_disabled = 0;    /* see disable_ctrl() */
 static int ctrlc_was_pressed = 0;
 int ctrlc(void)
 {
-	if (!ctrlc_disabled) {
-		if (mytstc()) {
-			switch (mygetc()) {
-			case 0x03:		/* ^C - Control C (ascii: 0x03) */
-				ctrlc_was_pressed = 1;
-				return 1;
-			default:
-				break;
-			}
-		}
-	}
-	return 0;
+    if (!ctrlc_disabled) {
+        if (mytstc()) {
+            switch (mygetc()) {
+            case 0x03:        /* ^C - Control C (ascii: 0x03) */
+                ctrlc_was_pressed = 1;
+                return 1;
+            default:
+                break;
+            }
+        }
+    }
+    return 0;
 }
 
 /* pass 1 to disable ctrlc() checking, 0 to enable.
@@ -138,20 +138,20 @@ int ctrlc(void)
  */
 int disable_ctrlc(int disable)
 {
-	int prev = ctrlc_disabled;	/* save previous state */
+    int prev = ctrlc_disabled;    /* save previous state */
 
-	ctrlc_disabled = disable;
-	return prev;
+    ctrlc_disabled = disable;
+    return prev;
 }
 
 int had_ctrlc (void)
 {
-	return ctrlc_was_pressed;
+    return ctrlc_was_pressed;
 }
 
 void clear_ctrlc(void)
 {
-	ctrlc_was_pressed = 0;
+    ctrlc_was_pressed = 0;
 }
 
 /************************************************************************/

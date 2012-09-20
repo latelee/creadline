@@ -7,6 +7,11 @@
 
 /* history command BEGIN */
 
+#ifndef CMD_LITE
+
+#define HIST_MAX		10
+#define HIST_SIZE		MAX_CMDBUF_SIZE
+
 static int hist_max = 0;
 static int hist_add_idx = 0;
 static int hist_cur = -1;
@@ -85,7 +90,7 @@ static char* hist_next(void)
 
     return (ret);
 }
-
+#endif
 /* history command END */
 
 #define getcmd_getch()      mygetc()
@@ -106,6 +111,8 @@ static char* hist_next(void)
 #define putnstr(str,n)    do {          \
     getcmd_printf ("%.*s", (int)n, str);\
 } while (0)
+
+#ifndef CMD_LITE
 
 #define BEGINNING_OF_LINE() {       \
     while (num) {                   \
@@ -140,6 +147,7 @@ static char* hist_next(void)
     num = eol_num;              \
     }                           \
 }
+#endif /* CMD_LITE */
 
 static void cread_add_char(char ichar, int insert, unsigned long *num,
                            unsigned long *eol_num, char *buf, unsigned long len)
@@ -246,8 +254,10 @@ static int cread_line(const char *const prompt, char *buf, unsigned int *len)
                 ichar = CTL_CH('e');
                 break;
             case 'S':   /* Delete */
-                ichar = CTL_CH('d');
+                //ichar = CTL_CH('d');  // Windows style(delete character underneath ther cursor)
+                ichar = BACKSPACE;      // Linux style(delete character left to the cursor)
                 break;
+
             default:
                 break;
             }
@@ -322,12 +332,23 @@ static int cread_line(const char *const prompt, char *buf, unsigned int *len)
             }
             break;
 
+#ifdef CMD_LITE
+        case CTL_CH('a'):
+        case CTL_CH('f'):
+        case CTL_CH('b'):
+        case CTL_CH('d'):
+        case CTL_CH('k'):
+        case CTL_CH('e'):
+        case CTL_CH('o'):
+        case CTL_CH('x'):
+        case CTL_CH('u'):
+        case CTL_CH('p'):
+        case CTL_CH('n'):
+            break;
+#else
         case CTL_CH('a'):
             BEGINNING_OF_LINE();
             break;
-        case CTL_CH('c'):    /* ^C - break */
-            *buf = '\0';    /* discard input */
-            return (-1);
         case CTL_CH('f'):
             if (num < eol_num)
             {
@@ -373,6 +394,41 @@ static int cread_line(const char *const prompt, char *buf, unsigned int *len)
             BEGINNING_OF_LINE();
             ERASE_TO_EOL();
             break;
+        case CTL_CH('p'):
+        case CTL_CH('n'):
+            {
+                char * hline;
+                esc_len = 0;
+
+                if (ichar == CTL_CH('p'))
+                    hline = hist_prev();
+                else
+                    hline = hist_next();
+
+                if (!hline)
+                {
+                    getcmd_cbeep();
+                    continue;
+                }
+
+                /* nuke the current line */
+                /* first, go home */
+                BEGINNING_OF_LINE();
+
+                /* erase to end of line */
+                ERASE_TO_EOL();
+
+                /* copy new line into place and display */
+                strcpy(buf, hline);
+                eol_num = (unsigned long)strlen(buf);
+                REFRESH_TO_EOL();
+                continue;
+            }
+#endif /* CMD_LITE */
+
+        case CTL_CH('c'):    /* ^C - break */
+            *buf = '\0';    /* discard input */
+            return (-1);
         case DEL:
         case DEL7:
         case BACKSPACE:
@@ -390,37 +446,7 @@ static int cread_line(const char *const prompt, char *buf, unsigned int *len)
                 eol_num--;
             }
             break;
-        case CTL_CH('p'):
-        case CTL_CH('n'):
-        {
-            char * hline;
 
-            esc_len = 0;
-
-            if (ichar == CTL_CH('p'))
-                hline = hist_prev();
-            else
-                hline = hist_next();
-
-            if (!hline)
-            {
-                getcmd_cbeep();
-                continue;
-            }
-
-            /* nuke the current line */
-            /* first, go home */
-            BEGINNING_OF_LINE();
-
-            /* erase to end of line */
-            ERASE_TO_EOL();
-
-            /* copy new line into place and display */
-            strcpy(buf, hline);
-            eol_num = (unsigned long)strlen(buf);
-            REFRESH_TO_EOL();
-            continue;
-        }
 // TODO
 #ifdef CONFIG_AUTO_COMPLETE
         case '\t': 
@@ -445,7 +471,7 @@ static int cread_line(const char *const prompt, char *buf, unsigned int *len)
             }
             break;
         }
-#endif
+#endif  /* CONFIG_AUTO_COMPLETE */
         default:
             cread_add_char(ichar, insert, &num, &eol_num, buf, *len);
             break;
@@ -455,10 +481,11 @@ static int cread_line(const char *const prompt, char *buf, unsigned int *len)
     *len = eol_num;
     buf[eol_num] = '\0';    /* lose the newline */
 
+#ifndef CMD_LITE
     if (buf[0] && buf[0] != CREAD_HIST_CHAR)
         cread_add_to_hist(buf);
     hist_cur = hist_add_idx;
-
+#endif
     return 0;
 }
 
@@ -467,6 +494,8 @@ int readline_into_buffer (const char *const prompt, char* buffer)
     char* p = buffer;
     unsigned int len=MAX_CMDBUF_SIZE;
     int rc;
+
+#ifndef CMD_LITE
     static int initted = 0;
 
     if (!initted)
@@ -474,9 +503,10 @@ int readline_into_buffer (const char *const prompt, char* buffer)
         hist_init();
         initted = 1;
     }
+#endif
 
     if (prompt)
-        printf("%s", prompt);
+        myputs(prompt);
 
     rc = cread_line(prompt, p, &len);
     return rc < 0 ? rc : len;

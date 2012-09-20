@@ -8,8 +8,8 @@ extern "C" {
 #endif
 
 /* stdin */
-int	mygetc(void);   /* To test if a char is ready... */
-int mytstc(void);   /* To get that char */
+int	mygetc(void);   /* To get that char */
+int mytstc(void);   /* To test if a char is ready. */
 
 /* stdout */
 void myputc(const char c);  /* To put a char */
@@ -27,6 +27,8 @@ int disable_ctrlc (int);	/* 1 to disable, 0 to enable Control-C detect */
 unsigned long   simple_strtoul(const char *cp,char **endp,unsigned int base);
 unsigned long long  simple_strtoull(const char *cp,char **endp,unsigned int base);
 long    simple_strtol(const char *cp,char **endp,unsigned int base);
+
+void initIBL();
 
 #ifdef _cplusplus
 };

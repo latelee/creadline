@@ -33,6 +33,10 @@
         Windows：删除当前光标所在字符
         Linux  ：删除当前光标前一个字符
  *
+ * log
+       2012-09-18
+       添加CMD_LITE宏，定义该宏时可节省内存，但大部分按键不可用，仅保存删除键。
+ *
  */
 
 #ifndef CREAD_LINE_H
@@ -43,14 +47,11 @@ extern "C" {
 #endif
 
 //#define SIMPLE_READLINE   /* very simple one using gets() */
+//#define CMD_LITE    /* define it to save text and memory */
 
 #define PROMPT          "NotAShell> "
 #define CB_SIZE         256 /* console buffer size */
 #define MAX_CMDBUF_SIZE CB_SIZE
-
-/* history command */
-#define HIST_MAX		10
-#define HIST_SIZE		MAX_CMDBUF_SIZE
 
 int readline (const char *const prompt, char* line_buf);
 
