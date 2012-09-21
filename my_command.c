@@ -242,7 +242,7 @@ int do_print(int argc, char * const argv[])
 static void do_set_usage()
 {
     myprintf("set bootfile [boot file].\n");
-    myprintf("set format [0(AUTO)|1(NAME)|2(BIS)|3(COFF)|4(ELF)|5(BBLOB)]|[6(BTBL)].\n");
+    myprintf("set format   [0(AUTO)|1(NAME)|2(BIS)|3(COFF)|4(ELF)|5(BBLOB)]|[6(BTBL)].\n");
     myprintf("set serverip [server ip].\n");
     myprintf("set ipaddr   [board ip].\n");
     myprintf("set gateway  [gateway].\n");
@@ -269,9 +269,6 @@ int do_set(int argc, char * const argv[])
     char tmp[6] = {0};
     int dhcp = 0;
     int format = 0;
-    //char a, b, c, d, e, f;
-    char *s;
-    char *e;
 
     if (argc != 3)
     {
@@ -301,7 +298,7 @@ int do_set(int argc, char * const argv[])
     {
         myprintf("serverip\n");
         myprintf("serverip: %s\n", argv[2]);
-        getaddr(argv[2], &tmp, 4, 10);
+        getaddr(argv[2], tmp, 4, 10);
         SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.serverIp, tmp[0],tmp[1],tmp[2],tmp[3]);
 
     }
@@ -309,28 +306,28 @@ int do_set(int argc, char * const argv[])
     {
         myprintf("ipaddr\n");
         myprintf("ipaddr: %s\n", argv[2]);
-        getaddr(argv[2], &tmp, 4, 10);
+        getaddr(argv[2], tmp, 4, 10);
         SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.ipAddr, tmp[0],tmp[1],tmp[2],tmp[3]);
     }
     else if (!strcmp("gateway", argv[1]))
     {
         myprintf("gateway\n");
         myprintf("gateway: %s\n", argv[2]);
-        getaddr(argv[2], &tmp, 4, 10);
+        getaddr(argv[2], tmp, 4, 10);
         SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.gatewayIp, tmp[0],tmp[1],tmp[2],tmp[3]);
     }
     else if (!strcmp("netmask", argv[1]))
     {
         myprintf("netmask\n");
         myprintf("netmask: %s\n", argv[2]);
-        getaddr(argv[2], &tmp, 4, 10);
+        getaddr(argv[2], tmp, 4, 10);
         SETIP(ibl.bootModes[2].u.ethBoot.ethInfo.netmask, tmp[0],tmp[1],tmp[2],tmp[3]);
     }
     else if (!strcmp("ethaddr", argv[1]))
     {
         myprintf("ethaddr\n");
         myprintf("ethaddr: %s\n", argv[2]);
-        getaddr(argv[2], &tmp, 6, 16);
+        getaddr(argv[2], tmp, 6, 16);
         SETMAC(ibl.bootModes[2].u.ethBoot.ethInfo.hwAddress, tmp[0],tmp[1],tmp[2],tmp[3],tmp[4],tmp[5]);
     }
     else if (!strcmp("dhcp", argv[1]))

@@ -30,12 +30,12 @@
 
 
         Delte键处理：
-        Windows：删除当前光标所在字符
+        Windows：删除当前光标所在字符(程序按Linux处理)
         Linux  ：删除当前光标前一个字符
  *
  * log
        2012-09-18
-       添加CMD_LITE宏，定义该宏时可节省内存，但大部分按键不可用，仅保存删除键。
+       添加CMD_LITE宏，定义该宏时可节省内存，但仅支持Backspace和Delete键。
  *
  */
 
