@@ -18,7 +18,7 @@
 struct cmd_s {
     const char *name;
     const char *help;
-    void	(*handler) (int argc, char* argv[]);
+    void    (*handler) (int argc, char* argv[]);
 };
 
 typedef struct cmd_s cmd_t;
@@ -56,7 +56,7 @@ cmd_t *getcmd(char *name)
     found = 0;
     for (c = cmdtab; (p = c->name) != NULL; c++) {
         for (q = name; *q == *p++; q++)
-            if (*q == 0)		/* exact match? */
+            if (*q == 0)        /* exact match? */
                 return (c);
         if (!*q) {
             return ((cmd_t *)-1);
@@ -97,13 +97,13 @@ static int parse_line(char *line, char *argv[])
 int run_command1(const char *cmd)
 {
     int argc;
-    char *argv[CONFIG_SYS_MAXARGS + 1];	/* NULL terminated	*/
-    char cmdbuf[CB_SIZE];	/* working copy of cmd		*/
+    char *argv[CONFIG_SYS_MAXARGS + 1];    /* NULL terminated    */
+    char cmdbuf[CB_SIZE];    /* working copy of cmd        */
     cmd_t *c;
 
     if (!cmd || !*cmd)
     {
-        return -1;	/* empty command */
+        return -1;    /* empty command */
     }
 
     if (strlen(cmd) >= CB_SIZE)
@@ -117,7 +117,7 @@ int run_command1(const char *cmd)
     /* Extract arguments */
     if ((argc = parse_line(cmdbuf, argv)) == 0)
     {
-        return -1;	/* no command at all */
+        return -1;    /* no command at all */
     }
 
     /* Look up command in command table */
@@ -125,7 +125,7 @@ int run_command1(const char *cmd)
     if (c == (cmd_t *)-1)
     {
         cmd_printf("Unknown command '%s' - try 'help'\n", argv[0]);
-        return -1;	/* give up after bad command */
+        return -1;    /* give up after bad command */
     }
 
     /* OK - call function to do the command */

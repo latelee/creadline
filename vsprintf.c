@@ -65,11 +65,11 @@ static char *upper_digits = "0123456789ABCDEF";
  */
 static unsigned int strnlen(const char * s, unsigned int count)
 {
-	const char *sc;
+    const char *sc;
 
-	for (sc = s; count-- && *sc != '\0'; ++sc)
-		/* nothing */;
-	return (int)(sc - s);
+    for (sc = s; count-- && *sc != '\0'; ++sc)
+        /* nothing */;
+    return (int)(sc - s);
 }
 
 static int skip_atoi(const char **s) {

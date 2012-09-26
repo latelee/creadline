@@ -6,14 +6,18 @@
 #include "cread_line.h"
 #include "command.h"
 
-#define mysleep Sleep
+#ifdef WIN32
+#define mysleep(x) Sleep(x)
+#else
+#define mysleep(x) usleep(x*1000)
+#endif
 
 int abortboot(int delay)
 {
     int abort = 0;
     int i = 0;
 
-    myprintf("Hit SPACE key to stop autoboot: %2d ", delay);
+    myprintf("Hit any key to stop autoboot: %2d ", delay);
 
     while ((delay > 0) && (!abort))
     {
@@ -41,12 +45,12 @@ int readline_test(void)
     static char lastcommand[CB_SIZE] = {0};
     int len;
 
-    //if (!abortboot(5))
-    //{
-    //    myprintf("Aotu run.\n");
-    //    return 0;
-    //}
-    //myprintf("You abort.\n");
+    if (!abortboot(5))
+    {
+        myprintf("Aotu run.\n");
+        return 0;
+    }
+    myprintf("You abort.\n");
 
     while (1)
     {
@@ -93,11 +97,11 @@ void test()
         printf("\b\b\b\b%2d%% ", cnt++);
         if (cnt == 100)
             break;
-        Sleep(1000);
+        mysleep(1000);
     }
-
 }
 
+// IPµØÖ·×ª»»²âÊÔ
 void test2()
 {
     char *end;
@@ -132,13 +136,28 @@ void test2()
     printf("\n");
 }
 
+// ¼ì²â°´¼ü
+void test3()
+{
+    printf("test3:\n");
+    while (1)
+    {
+        if (mytstc())
+        {
+            printf("you hit a key.\n");
+            break;
+        }
+    }
+}
+
 int main(int argc, char* argv[])
 {
+    //test();
     //test2();
+    //test3();
     initIBL();
     readline_test();
-    //myputs("hello world.\r");
-    //myprintf("hello\n");
+
     return 0;
 }
 

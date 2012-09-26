@@ -9,16 +9,13 @@
 
 #ifndef CMD_LITE
 
-#define HIST_MAX		10
-#define HIST_SIZE		MAX_CMDBUF_SIZE
-
 static int hist_max = 0;
 static int hist_add_idx = 0;
 static int hist_cur = -1;
 unsigned int hist_num = 0;
 
 static char* hist_list[HIST_MAX];
-static char hist_lines[HIST_MAX][HIST_SIZE + 1];	 /* Save room for NULL */
+static char hist_lines[HIST_MAX][HIST_SIZE + 1];     /* Save room for NULL */
 
 static void hist_init(void)
 {

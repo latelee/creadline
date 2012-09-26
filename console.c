@@ -3,10 +3,6 @@
 #include <ctype.h>
 #include "common.h"
 
-#ifdef WIN32
-#include <windows.h>
-#endif
-
 /* implement of getch() */
 #ifdef WIN32
 #include <conio.h>
@@ -16,10 +12,22 @@ int mygetc(void)
     return getch();
 }
 
+/** 
+ * return non-zero if a key pressed, zero if not.
+ *
+ */
+int mytstc(void)
+{
+    return kbhit();
+}
+
 #else
 
 #include <termios.h> /* for tcxxxattr, ECHO, etc */
 #include <unistd.h> /* for STDIN_FILENO */
+#include <sys/select.h>
+#include <sys/time.h>
+#include <sys/types.h>
 
 /*simulate windows' getch(), it works!!*/
 int mygetc(void)
@@ -43,17 +51,80 @@ int mygetc(void)
 
     return ch;
 }
-#endif
 
-/* return 1 if a key press */ 
-// note: only space key....
 int mytstc(void)
 {
-    // return tstc();
-#ifdef WIN32
-    return (GetAsyncKeyState(VK_SPACE) & 0x8000);
-#endif
+    struct timeval tv;
+    fd_set rdfs;
+    int ch;
+    struct termios oldt, newt;
+
+    // get terminal input's attribute
+    tcgetattr(STDIN_FILENO, &oldt);
+    newt = oldt;
+
+    //set termios' local mode
+    newt.c_lflag &= ~(ECHO|ICANON);
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+
+    tv.tv_sec = 0;
+    tv.tv_usec = 100;
+    FD_ZERO(&rdfs);
+    FD_SET (STDIN_FILENO, &rdfs);
+
+    select(STDIN_FILENO+1, &rdfs, NULL, NULL, &tv);
+    ch = FD_ISSET(STDIN_FILENO, &rdfs);
+
+    //recover terminal's attribute
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+    return ch;
 }
+
+// another way of kbhit
+#if 0
+/*
+ * kbhit() -- a keyboard lookahead monitor
+ *
+ * returns the number of characters available to read
+ */
+static int kbhit ( void )
+{
+    struct timeval tv;
+    struct termios old_termios, new_termios;
+    int            error;
+    int            count = 0;
+    tcgetattr( 0, &old_termios );
+    new_termios              = old_termios;
+    /*
+     * raw mode
+     */
+    new_termios.c_lflag     &= ~ICANON;
+    /*
+     * disable echoing the char as it is typed
+     */
+    new_termios.c_lflag     &= ~ECHO;
+    /*
+     * minimum chars to wait for
+     */
+    new_termios.c_cc[VMIN]   = 1;
+    /*
+     * minimum wait time, 1 * 0.10s
+     */
+    new_termios.c_cc[VTIME]  = 1;
+    error                    = tcsetattr( 0, TCSANOW, &new_termios );
+    tv.tv_sec                = 0;
+    tv.tv_usec               = 100;
+    /*
+     * insert a minimal delay
+     */
+    select( 1, NULL, NULL, NULL, &tv );
+    error                   += ioctl( 0, FIONREAD, &count );
+    error                   += tcsetattr( 0, TCSANOW, &old_termios );
+    return( error == 0 ? count : -1 );
+}  /* end of kbhit */
+#endif // #if 0
+
+#endif
 
 /**
  * 输出'字符'，如myputc(1)，即输出ascii码1对应的字符，并非字符'1'
