@@ -6,6 +6,8 @@
 
 #include "common.h"
 
+// TODO：本文件的测试函数需要删除
+
 /* a signed 16-bit integer */
 typedef short int16;
 typedef unsigned short uint16;

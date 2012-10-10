@@ -43,6 +43,27 @@
        2012-09-18
        添加CMD_LITE宏，定义该宏时可节省内存，但仅支持Backspace和Delete键。
  *
+ * note
+       2012-09-26
+       方向键及其它：
+       Windows: 
+                up:     0xe0 'H'
+                down:   0xe0 'P'
+                right:  0xe0 'M'
+                left:   0xe0 'K'
+
+                HOME:   0xe0 'G'
+                END:    0xe0 'O'(大写字母O)
+                Delete: 0xe0 'S'
+        Linux：
+                up:     0x1b 0x5b 0x41  ^[[A
+                down:   0x1b 0x5b 0x42  ^[[B
+                right:  0x1b 0x5b 0x43  ^[[C
+                left:   0x1b 0x5b 0x44  ^[[D
+                
+                HOME:   ?
+                END:    ? 
+                Delete: 0x7f 
  */
 
 #ifndef CREAD_LINE_H

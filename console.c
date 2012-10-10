@@ -3,7 +3,6 @@
 #include <ctype.h>
 #include "common.h"
 
-/* implement of getch() */
 #ifdef WIN32
 #include <conio.h>
 
