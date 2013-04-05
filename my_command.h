@@ -7,8 +7,6 @@ extern "C" {
 
 int do_help(int argc, char * const argv[]);
 int do_print(int argc, char * const argv[]);
-int do_set(int argc, char * const argv[]);
-int do_boot(int argc, char * const argv[]);
 int do_exit(int argc, char * const argv[]);
 
 #ifdef __cplusplus

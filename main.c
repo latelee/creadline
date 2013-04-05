@@ -155,7 +155,6 @@ int main(int argc, char* argv[])
     //test();
     //test2();
     //test3();
-    initIBL();
     readline_test();
 
     return 0;
