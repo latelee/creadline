@@ -10,25 +10,26 @@
 cmd_tbl_t cmd_table[] = 
 {
     {"help", CONFIG_SYS_MAXARGS, do_help, "print help info."},
-    {"print", 1, do_print, "print the env."},
+    {"print", 2, do_print, "print the env."},
     {"exit", 1, do_exit, "exit..."},
     {NULL, 0, NULL, NULL},
 };
 
-int do_help(int argc, char * const argv[])
+int do_help(int argc, char* argv[])
 {
-    _do_help(cmd_table, sizeof(cmd_table)/sizeof(cmd_tbl_t), argc, argv);
+    _do_help(cmd_table, argc, argv);
     return 0;
 }
 
 
-int do_print(int argc, char * const argv[])
+int do_print(int argc, char* argv[])
 {
-    myprintf("in %s\n", __FUNCTION__);
+
+    myprintf("in %s argc: %d %s %s\n", __FUNCTION__, argc, argv[0], argv[1]);
     return 0;
 }
 
-int do_exit(int argc, char * const argv[])
+int do_exit(int argc, char* argv[])
 {
     exit(0);
     return 0;

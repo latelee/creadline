@@ -31,8 +31,8 @@ int cmd_usage(cmd_tbl_t *cmdtp);
  * for long help messages
  */
 
-int _do_help (cmd_tbl_t *cmd_start, int cmd_items,
-              int argc, char * const argv[])
+int _do_help (cmd_tbl_t *cmd_start,
+              int argc, char* argv[])
 {
     int i;
     int rcode = 0;
@@ -71,17 +71,12 @@ int _do_help (cmd_tbl_t *cmd_start, int cmd_items,
         //}
 
         /* print short help (usage) */
-        for (i = 0; i < cmd_items; i++)
+        cmdtp = cmd_start;
+        while (cmdtp->name != NULL)
         {
-            const char *usage = cmd_start[i].usage;
-
-            /* allow user abort */
-            //if (ctrlc ())
-            //    return 1;
-            if (usage == NULL)
-                continue;
             cmd_printf("%-*s- %s\n", CONFIG_SYS_HELP_CMD_WIDTH,
-                   cmd_start[i].name, usage);
+                   cmdtp->name, cmdtp->usage);
+            cmdtp++;
         }
         return 0;
     }
