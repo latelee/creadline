@@ -1,10 +1,16 @@
+#include <unistd.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+
 #ifdef WIN32
 #include <windows.h>
 #endif
+
 #include "cread_line.h"
 #include "command.h"
+
+#include "my_command.h"
 
 #ifdef WIN32
 #define mysleep(x) Sleep(x)
@@ -12,76 +18,67 @@
 #define mysleep(x) usleep(x*1000)
 #endif
 
-int abortboot(int delay)
-{
-    int abort = 0;
-    int i = 0;
+#define PROMPT          "NotAShell> "
 
-    myprintf("Hit any key to stop autoboot: %2d ", delay);
+// int abortboot(int delay)
+// {
+//     int abort = 0;
+//     int i = 0;
 
-    while ((delay > 0) && (!abort))
-    {
-        --delay;
-        for (i = 0; !abort && i < 100; ++i)
-        {
-            if (mytstc())
-            {
-                abort = 1;
-                delay = 0;
-                mygetc();
-                break;
-            }
-            mysleep(10);
-        }
-        myprintf("\b\b\b%2d ", delay);
-    }
-    myputc('\n');
+//     printf("Hit any key to stop autoboot: %2d ", delay);
 
-    return abort;
-}
+//     while ((delay > 0) && (!abort))
+//     {
+//         --delay;
+//         for (i = 0; !abort && i < 100; ++i)
+//         {
+//             if (mytstc())
+//             {
+//                 abort = 1;
+//                 delay = 0;
+//                 mygetc();
+//                 break;
+//             }
+//             mysleep(10);
+//         }
+//         printf("\b\b\b%2d ", delay);
+//     }
+//     myputc('\n');
+
+//     return abort;
+// }
 
 int readline_test(void)
 {
     static char lastcommand[CB_SIZE] = {0};
     int len;
 
-    if (!abortboot(5))
-    {
-        myprintf("Aotu run.\n");
-        return 0;
-    }
-    myprintf("You abort.\n");
+    // 嵌入式串口终端支持，但一般发行Linux不支持，暂舍去
+    // if (!abortboot(5))
+    // {
+    //     printf("Aotu run.\n");
+    //     return 0;
+    // }
+    // printf("You abort.\n");
 
+    cmd_init();
     while (1)
     {
         len = readline(PROMPT, lastcommand);
-        if (len > 0)
+        if (len >= CB_SIZE)
         {
-            //printf("len: %d\n", len);
-            if (len >= CB_SIZE)
-            {
-                myprintf("command line too large.\n");
-                break;
-            }
-            //strcpy(lastcommand, console_buffer);
-            //printf("[echo]: %s\n", lastcommand);
+                printf("command line too large.\n");
+                continue;
         }
-
-        else if (len == 0)
+        else if (len == -1)
         {
-            //printf("nothing input.\n");
-            // do nothing
-        }
-
-        if (len == -1)
-        {
-            myputs("<INTERRUPT>\n");
+            printf("<INTERRUPT>\n");
+            continue;
         }
         else
         {
             run_command(lastcommand);
         }
-     
     }
     return 0;
 }
@@ -111,7 +108,7 @@ void test2()
     unsigned char enetaddr[16];
 
     for (i = 0; i < 6; ++i) {
-        enetaddr[i] = addr ? simple_strtoul(addr, &end, 16) : 0;
+        enetaddr[i] = addr ? strtoul(addr, &end, 16) : 0;
         if (addr)
             addr = (*end) ? end + 1 : end;
     }
@@ -123,7 +120,7 @@ void test2()
     }
 
     for (i = 0; i < 4; ++i) {
-        enetaddr[i] = ip ? simple_strtoul(ip, &end, 10) : 0;
+        enetaddr[i] = ip ? strtoul(ip, &end, 10) : 0;
         if (ip)
             ip = (*end) ? end + 1 : end;
     }

@@ -24,7 +24,7 @@ RM = -rm -rf
 MAKE = make
 
 CFLAGS = -Wall
-#debug = y
+debug = y
 
 ifeq ($(debug), y)
 CFLAGS += -g
@@ -38,15 +38,16 @@ CFLAGS += $(DEFS)
 
 LDFLAGS = 
 
-INCDIRS = ./
+INCDIRS = -I./ -I./readline/
 
-CFLAGS += -I$(INCDIRS)
+CFLAGS += $(INCDIRS)
 
 LDFLAGS += 
 
 # source file(s), including c file(s) cpp file(s)
 # you can also use $(wildcard *.c), etc.
 SRC_C   := $(wildcard *.c)
+SRC_C   += $(wildcard readline/*.c)
 SRC_CPP := $(wildcard *.cpp)
 
 # object file(s)

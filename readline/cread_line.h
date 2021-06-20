@@ -76,7 +76,6 @@ extern "C" {
 //#define SIMPLE_READLINE   /* very simple one using gets() */
 //#define CMD_LITE    /* define it to save text and memory */
 
-#define PROMPT          "NotAShell> "
 #define CB_SIZE         256 /* console buffer size */
 #define MAX_CMDBUF_SIZE CB_SIZE
 

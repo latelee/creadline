@@ -44,11 +44,12 @@ struct cmd_tbl_s {
 
 typedef struct cmd_tbl_s    cmd_tbl_t;
 
-/* someone should implement the table */
-extern cmd_tbl_t cmd_table[];
+// /* someone should implement the table */
+// extern cmd_tbl_t cmd_table[];
 
-extern int _do_help (cmd_tbl_t *cmd_start,
-                     int argc, char* argv[]);
+void register_command(cmd_tbl_t* table, int len);
+
+int do_help(int argc, char* argv[]);
 
 int run_command (const char* cmd);
 

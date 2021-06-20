@@ -26,6 +26,28 @@ cmd_tbl_t *find_cmd (const char* cmd);
 
 int cmd_usage(cmd_tbl_t *cmdtp);
 
+int _do_help (cmd_tbl_t *cmd_start,
+              int argc, char* argv[]);
+
+static cmd_tbl_t* cmd_table;
+static int cmd_table_len = 0;
+
+/*
+ register command
+*/
+void register_command(cmd_tbl_t* table, int len)
+{
+    cmd_table = table;
+    cmd_table_len = len;
+}
+
+
+int do_help(int argc, char* argv[])
+{
+    _do_help(cmd_table, argc, argv);
+    return 0;
+}
+
 /*
  * Use puts() instead of printf() to avoid printf buffer overflow
  * for long help messages
@@ -71,12 +93,11 @@ int _do_help (cmd_tbl_t *cmd_start,
         //}
 
         /* print short help (usage) */
-        cmdtp = cmd_start;
-        while (cmdtp->name != NULL)
+        for (i = 0; i < cmd_table_len; i++)
         {
+            cmdtp = cmd_start + i;
             cmd_printf("%-*s- %s\n", CONFIG_SYS_HELP_CMD_WIDTH,
                    cmdtp->name, cmdtp->usage);
-            cmdtp++;
         }
         return 0;
     }
@@ -107,6 +128,7 @@ cmd_tbl_t *find_cmd_tbl (const char *cmd, cmd_tbl_t *table, int table_len)
     //const char *p;
     int len;
     int n_found = 0;
+    int i = 0;
 
     /*
      * Some commands allow length modifiers (like "cp.b");
@@ -115,10 +137,12 @@ cmd_tbl_t *find_cmd_tbl (const char *cmd, cmd_tbl_t *table, int table_len)
     //len = ((p = strchr(cmd, '.')) == NULL) ? (int)strlen (cmd) : (int)(p - cmd);
     len = (int)strlen(cmd);
 
-    for (cmdtp = table;
-         cmdtp != table + table_len;
-         cmdtp++)
+    // for (cmdtp = table;
+    //      cmdtp != table + table_len;
+    //      cmdtp++)
+    for (i = 0; i < cmd_table_len; i++)    
     {
+        cmdtp = table + i;
         if (strncmp (cmd, cmdtp->name, len) == 0)
         {
             if (len == strlen (cmdtp->name))
@@ -195,11 +219,7 @@ cmd_tbl_t* find_cmd_tbl3(const char* cmd, cmd_tbl_t *table)
 
 cmd_tbl_t *find_cmd (const char* cmd)
 {
-    //int len = sizeof(cmd_table) / sizeof(cmd_tbl_t);
-    //return find_cmd_tbl(cmd, cmd_table, len);
-
-    //return find_cmd_tbl2(cmd, cmd_table);
-    return find_cmd_tbl3(cmd, cmd_table);
+    return find_cmd_tbl(cmd, cmd_table, cmd_table_len);
 }
 
 int cmd_usage(cmd_tbl_t *cmdtp)

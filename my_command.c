@@ -4,28 +4,26 @@
 #include "command.h"
 #include "my_command.h"
 
-#include "common.h"
-
-/* just a foolish command table */
-cmd_tbl_t cmd_table[] = 
+/* 定义命令列表 */
+cmd_tbl_t my_cmd_table[] = 
 {
+    // do_help为默认函数，可重新实现
     {"help", CONFIG_SYS_MAXARGS, do_help, "print help info."},
     {"print", 2, do_print, "print the env."},
     {"exit", 1, do_exit, "exit..."},
-    {NULL, 0, NULL, NULL},
+    {"quit", 1, do_exit, "exit..."},
 };
 
-int do_help(int argc, char* argv[])
+// 初始化，注册命令
+void cmd_init()
 {
-    _do_help(cmd_table, argc, argv);
-    return 0;
+    int len = sizeof(my_cmd_table) / sizeof(my_cmd_table[0]);
+    register_command(my_cmd_table, len);
 }
-
 
 int do_print(int argc, char* argv[])
 {
-
-    myprintf("in %s argc: %d %s %s\n", __FUNCTION__, argc, argv[0], argv[1]);
+    printf("in %s argc: %d %s %s\n", __FUNCTION__, argc, argv[0], argv[1]);
     return 0;
 }
 
