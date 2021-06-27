@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 void cmd_init();
+cmd_tbl_t* find_table(const char* cmdname);
 
 int do_help_default(int argc, char* argv[]);
 int do_print(int argc, char* argv[]);

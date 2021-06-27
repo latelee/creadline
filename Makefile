@@ -1,83 +1,165 @@
-#
-# (C) Copyleft 2011
-# Late Lee from http://www.latelee.org
+# (C) Copyleft 2011 2012 2013 2014 2015 2016 2017 2018 2019 2020
+# Late Lee(li@latelee.org) from http://www.latelee.org
 # 
-# A simple Makefile for *ONE* project(c or/and cpp file) in *ONE*  directory
+# A simple Makefile for *ONE* project(c or/and cpp file) in *ONE* or *MORE* directory
 #
 # note: 
 # you can put head file(s) in 'include' directory, so it looks 
 # a little neat.
 #
-# usage: $ make
-#        $ make debug=y
+# usage: 
+#        $ make
+#        $ make V=1     # verbose ouput
+#        $ make CROSS_COMPILE=arm-arago-linux-gnueabi-  # cross compile for ARM, etc.
+#        $ make debug=y # debug
+#
+# log
+#       2013-05-14 sth about debug...
+#       2016-02-29 sth for c/c++ multi diretory
+#       2017-04-17 -s for .a/.so if no debug
+#       2017-05-05 Add V for verbose ouput
 ###############################################################################
 
-# cross compile...
-CROSS_COMPILE = #arm_v5t_le-
+# !!!=== cross compile...
+CROSS_COMPILE ?= 
 
-CC = $(CROSS_COMPILE)gcc
+MKDIR_P ?= mkdir -p
+
+CC  = $(CROSS_COMPILE)gcc
 CXX = $(CROSS_COMPILE)g++
-AR = $(CROSS_COMPILE)ar
+AR  = $(CROSS_COMPILE)ar
 
-ARFLAGS = cr
-RM = -rm -rf
-MAKE = make
+# !!!===
+# in case all .c/.cpp need g++, specify CC=CXX...
+# CC = $(CXX)
 
-CFLAGS = -Wall
-debug = y
+ARFLAGS = -cr
+RM     = -rm -rf
+MAKE   = make
+
+# !!!===
+# target executable file or .a or .so
+target = a.out
+target2 = a_all.out
+
+# !!!===
+# compile flags
+CFLAGS += -Wall -Wfatal-errors -MMD
+
+# !!!=== pkg-config here
+#CFLAGS += $(shell pkg-config --cflags --libs glib-2.0 gattlib)
+#LDFLAGS += $(shell pkg-config --cflags --libs glib-2.0 gattlib)
+
+#****************************************************************************
+# debug can be set to y to include debugging info, or n otherwise
+debug  = y
+
+#****************************************************************************
 
 ifeq ($(debug), y)
-CFLAGS += -g
+    CFLAGS += -ggdb -rdynamic
 else
-CFLAGS += -O2 -s
+    CFLAGS += -O2 -s
 endif
 
-DEFS = 
+# !!!===
+# Macros define here
+DEFS    += -DJIMKENT
 
-CFLAGS += $(DEFS)
+# !!! compile flags define here...
+CFLAGS  += $(DEFS)
+# !!! c++ flags
+CXXFLAGS = $(CFLAGS)
+# !!! library here...
+LIBS    += 
+# !!! gcc/g++ link flags here
+LDFLAGS += $(LIBS) -lpthread -lrt
 
-LDFLAGS = 
+# !!!===
+# include head file directory here
+INC = ./ ./inc
+# or try this
+INC += $(shell find $(SRCS) -type d)
 
-INCDIRS = -I./ -I./readline/
+# !!!===
+# build directory
+BUILD_DIR ?= #./build/
 
+# !!!===
+# source file(s), including ALL c file(s) or cpp file(s)
+# just need the directory.
+SRC_DIRS = . 
+# or try this
+#SRC_DIRS = . ../outbox
+
+# !!!===
+# gcc/g++ compile flags
 CFLAGS += $(INCDIRS)
+CXXFLAGS += -std=c++11
 
-LDFLAGS += 
+# dynamic library build flags
+DYNC_FLAGS += -fpic -shared
 
-# source file(s), including c file(s) cpp file(s)
-# you can also use $(wildcard *.c), etc.
-SRC_C   := $(wildcard *.c)
-SRC_C   += $(wildcard readline/*.c)
-SRC_CPP := $(wildcard *.cpp)
+# include directory(s)
+INCDIRS := $(addprefix -I, $(INC))
 
-# object file(s)
-OBJ_C   := $(patsubst %.c,%.o,$(SRC_C))
-OBJ_CPP := $(patsubst %.cpp,%.o,$(SRC_CPP))
+# source file(s)
+SRCS := $(shell find $(SRC_DIRS) -maxdepth 2 -name '*.cpp' -or -name '*.c')
+# or try this
+#SRCS := $(shell find $(SRC_DIRS) -name '*.cpp' -or -name '*.c')
 
+OBJS = $(patsubst %.c,$(BUILD_DIR)%.o, $(patsubst %.cpp,$(BUILD_DIR)%.o, $(SRCS))) 
 
-# executable file
-target = a.out
+# depend files(.d)
+DEPS := $(OBJS:.o=.d)
+
+ifeq ($(V),1)
+Q=
+NQ=true
+else
+Q=@
+NQ=echo
+endif
 
 ###############################################################################
 
-all: $(target)
+all: $(BUILD_DIR)$(target)
 
-$(target): $(OBJ_C) $(OBJ_CPP)
-	@echo "Generating executable file..." $(notdir $(target))
-	@$(CXX) $(CFLAGS) $^ -o $(target) $(LDFLAGS)
+$(BUILD_DIR)$(target): $(OBJS)
+
+ifeq ($(suffix $(target)), .so)
+	@$(NQ) "Generating dynamic lib file..." $(notdir $(target))
+	$(Q)$(CXX) $^ $(LDFLAGS) $(DYNC_FLAGS) -o $(target)
+else ifeq ($(suffix $(target)), .a)
+	@$(NQ) "Generating static lib file..." $(notdir $(target))
+	$(Q)$(AR) $(ARFLAGS) -o $(target) $^
+else
+	@$(NQ) "Generating executable file..." $(notdir $(target))
+	$(Q)$(CXX) $^ $(LDFLAGS) -o $(target)
+	$(Q)cp $(target) $(target2)
+endif
 
 # make all .c or .cpp
-%.o: %.c
-	@echo "Compling: " $(addsuffix .c, $(basename $(notdir $@)))
-	@$(CC) $(CFLAGS) -c $< -o $@
+$(BUILD_DIR)%.o: %.c
+	@$(MKDIR_P) $(dir $@)
+	@$(NQ) "Compiling: " $(addsuffix .c, $(basename $(notdir $@)))
+	$(Q)$(CC) $(CFLAGS) -c $< -o $@
 
-%.o: %.cpp
-	@echo "Compling: " $(addsuffix .cpp, $(basename $(notdir $@)))
-	@$(CXX) $(CFLAGS) -c $< -o $@
+$(BUILD_DIR)%.o: %.cpp
+	@$(MKDIR_P) $(dir $@)
+	@$(NQ) "Compiling: " $(addsuffix .cpp, $(basename $(notdir $@)))
+	$(Q)$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	@echo "cleaning..."
-	@$(RM) $(target)
-	@$(RM) *.o *.back *~
+	@$(NQ) "Cleaning..."
+	$(Q)$(RM) $(OBJS) $(target) $(DEPS)
+# delete build directory if needed
+ifneq ($(BUILD_DIR),)
+	$(Q)$(RM) $(BUILD_DIR)
+endif
+# use 'grep -v soapC.o' to skip the file
+	@find . -iname '*.o' -o -iname '*.bak' -o -iname '*.d' | xargs rm -f
 
 .PHONY: all clean
+
+-include $(DEPS)

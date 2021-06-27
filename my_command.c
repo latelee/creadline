@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "rl_command.h"
 #include "my_command.h"
@@ -21,9 +22,25 @@ void cmd_init()
     register_command(my_cmd_table, len);
 }
 
+cmd_tbl_t* find_table(const char* cmdname)
+{
+    int i = 0;
+    int len = sizeof(my_cmd_table) / sizeof(my_cmd_table[0]);
+    for (i = 0; i < len; i++)
+    {
+        if (!strcmp(my_cmd_table[i].name, cmdname))
+        {
+            return &my_cmd_table[i];
+        }
+    }
+    return NULL;
+}
+
 int do_print(int argc, char* argv[])
 {
-    printf("in %s argc: %d %s %s\n", __FUNCTION__, argc, argv[0], argv[1]);
+    int i = 0;
+    for (i = 0; i < argc; i++)
+    printf("in %s argc: %d/%d %s\n", __FUNCTION__, i, argc, argv[i]);
     return 0;
 }
 
