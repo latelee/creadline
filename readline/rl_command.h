@@ -1,5 +1,5 @@
 /**
- * @file   command.h
+ * @file   rl_command.h
  * @author Late Lee <latelee@163.com>
  * @date   Thu Sep 06 08:52:01 2012
  * 
@@ -12,8 +12,8 @@
  * 
  */
 
-#ifndef COMMAN_H
-#define COMMAN_H
+#ifndef RL_COMMAN_H
+#define RL_COMMAN_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,7 +49,7 @@ typedef struct cmd_tbl_s    cmd_tbl_t;
 
 void register_command(cmd_tbl_t* table, int len);
 
-int do_help(int argc, char* argv[]);
+int do_help_default(int argc, char* argv[]);
 
 int run_command (const char* cmd);
 

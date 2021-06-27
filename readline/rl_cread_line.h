@@ -1,5 +1,5 @@
 /**
- * @file   cread_line.h
+ * @file   rl_cread_line.h
  * @author Late Lee 
  * @date   2012-9-5 22:52:20
  * @brief
@@ -66,8 +66,8 @@
                 Delete: 0x7f 
  */
 
-#ifndef CREAD_LINE_H
-#define CREAD_LINE_H
+#ifndef RL_CREAD_LINE_H
+#define RL_CREAD_LINE_H
 
 #ifdef __cplusplus
 extern "C" {

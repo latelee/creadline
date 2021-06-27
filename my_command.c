@@ -1,14 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "command.h"
+#include "rl_command.h"
 #include "my_command.h"
 
 /* 定义命令列表 */
 cmd_tbl_t my_cmd_table[] = 
 {
-    // do_help为默认函数，可重新实现
-    {"help", CONFIG_SYS_MAXARGS, do_help, "print help info."},
+    // do_help_default为默认函数，可重新实现
+    {"help", CONFIG_SYS_MAXARGS, do_help_default, "print help info."},
     {"print", 2, do_print, "print the env."},
     {"exit", 1, do_exit, "exit..."},
     {"quit", 1, do_exit, "exit..."},

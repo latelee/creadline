@@ -1,7 +1,7 @@
 #include <stdio.h>  // putchar
 #include <stddef.h>
 #include <ctype.h>
-#include "common.h"
+#include "rl_common.h"
 
 #ifdef WIN32
 #include <conio.h>

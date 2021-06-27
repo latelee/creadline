@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
-#include "cread_line.h"
-#include "common.h"
+#include "rl_cread_line.h"
+#include "rl_common.h"
 
 #ifndef SIMPLE_READLINE
 

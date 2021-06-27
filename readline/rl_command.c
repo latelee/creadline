@@ -11,9 +11,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "command.h"
-#include "cread_line.h"
-#include "common.h"
+#include "rl_command.h"
+#include "rl_cread_line.h"
+#include "rl_common.h"
 
 /* just wrap the functions, in case that someone need implement them */
 #define cmd_puts    myputs
@@ -26,7 +26,7 @@ cmd_tbl_t *find_cmd (const char* cmd);
 
 int cmd_usage(cmd_tbl_t *cmdtp);
 
-int _do_help (cmd_tbl_t *cmd_start,
+int _do_help_default (cmd_tbl_t *cmd_start,
               int argc, char* argv[]);
 
 static cmd_tbl_t* cmd_table;
@@ -42,9 +42,9 @@ void register_command(cmd_tbl_t* table, int len)
 }
 
 
-int do_help(int argc, char* argv[])
+int do_help_default(int argc, char* argv[])
 {
-    _do_help(cmd_table, argc, argv);
+    _do_help_default(cmd_table, argc, argv);
     return 0;
 }
 
@@ -53,7 +53,7 @@ int do_help(int argc, char* argv[])
  * for long help messages
  */
 
-int _do_help (cmd_tbl_t *cmd_start,
+int _do_help_default (cmd_tbl_t *cmd_start,
               int argc, char* argv[])
 {
     int i;

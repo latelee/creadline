@@ -11,8 +11,8 @@
            添加检测任意键按下的函数mytstc，不再使用Windows API方法。
            注：使用该函数后，输入缓冲区会有数据，需要使用mygetc读取。
  */
-#ifndef COMMAN_H
-#define COMMAN_H
+#ifndef RL_COMMAN_H
+#define RL_COMMAN_H
 
 #include <stdarg.h>
 

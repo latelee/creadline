@@ -139,13 +139,13 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath=".\command.h">
+				RelativePath=".\rl_command.h">
 			</File>
 			<File
-				RelativePath=".\common.h">
+				RelativePath=".\rl_common.h">
 			</File>
 			<File
-				RelativePath=".\cread_line.h">
+				RelativePath=".\rl_cread_line.h">
 			</File>
 			<File
 				RelativePath=".\my_command.h">

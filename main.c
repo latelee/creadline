@@ -7,8 +7,8 @@
 #include <windows.h>
 #endif
 
-#include "cread_line.h"
-#include "command.h"
+#include "rl_cread_line.h"
+#include "rl_command.h"
 
 #include "my_command.h"
 
