@@ -74,12 +74,9 @@ int readline_cmd_allone(int argc, char ** argv)
 		{
 			continue;
 		}
-        char cmd[128];
-		memcpy(cmd, v[i].c_str(), 128);
 
-		// 是否再转成argv的形式？？
-		
-        std::vector<std::string> vv = splitString(cmd, " ");
+		// 转成argv的形式
+        std::vector<std::string> vv = splitString(v[i].c_str(), " ");
         myargc = (int)vv.size();
         myargc = myargc > MAX_ARGC ? MAX_ARGC : myargc;
         for (int j = 0; j < myargc; j++)

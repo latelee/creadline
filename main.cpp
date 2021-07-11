@@ -76,6 +76,35 @@ void test2()
 //     }
 // }
 
+// 定义入口函数
+typedef int (*main_cmd_func)(int argc, char* argv[]);
+typedef struct main_cmd_tbl_tt {
+    const char    *name;
+    main_cmd_func cmd;
+} main_cmd_tbl_t;
+
+static main_cmd_tbl_t my_cmd_table[] = 
+{
+    {"a.out", readline_cmd},
+    {"a_all.out", readline_cmd_allone},
+};
+
+// 查找入口函数，如果找不到，默认使用第1项，即始终会运行程序
+main_cmd_tbl_t* find_table(const char* cmdname)
+{
+    int i = 0;
+    int len = sizeof(my_cmd_table) / sizeof(my_cmd_table[0]);
+    for (i = 0; i < len; i++)
+    {
+        if (!strcmp(my_cmd_table[i].name, cmdname))
+        {
+            break;
+        }
+    }
+    if (i >= len) i = 0;
+    return &my_cmd_table[i];
+}
+
 int main(int argc, char* argv[])
 {
     //test();
@@ -89,22 +118,7 @@ int main(int argc, char* argv[])
 		cmdname = p + 1;
 	}
 
-	if (strcmp(cmdname, "a.out") == 0)
-    {
-		if (readline_cmd(argc, argv) != 0)
-			return -1;
-
-		return 0;
-	}
-    else if (strcmp(cmdname, "a_all.out") == 0)
-    {
-		if (readline_cmd_allone(argc, argv) != 0)
-			return -1;
-
-		return 0;
-	}
-
-
-    return 0;
+    main_cmd_tbl_t* tbl = find_table(cmdname);
+    return tbl->cmd(argc, argv);
 }
 

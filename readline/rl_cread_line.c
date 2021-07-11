@@ -35,6 +35,9 @@ static void hist_init(void)
 
 static void cread_add_to_hist(char *line)
 {
+    // 判断是否为相同的命令（第0条命令没有相同的说法）
+    if (hist_add_idx > 1 && !strcmp(hist_list[hist_add_idx-1], line)) return;
+
     strcpy(hist_list[hist_add_idx], line);
 
     if (++hist_add_idx >= HIST_MAX)

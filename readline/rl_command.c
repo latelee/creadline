@@ -250,6 +250,7 @@ int parse_line (char *line, char *argv[])
 #endif
     while (nargs < CONFIG_SYS_MAXARGS)
     {
+        // 前面的空格
         /* skip any white space */
         while ((*line == ' ') || (*line == '\t'))
         {
@@ -265,12 +266,23 @@ int parse_line (char *line, char *argv[])
             return (nargs);
         }
 
-        argv[nargs++] = line;    /* begin of argument string    */
-
-        /* find end of string */
-        while (*line && (*line != ' ') && (*line != '\t'))
+        // 有双引号，特殊处理
+        if (*line == '\"')
         {
-            ++line;
+            argv[nargs++] = ++line; // 跳过第一个双引号
+            while(*line && (*line != '\"'))
+            {
+                ++line;
+            }
+        }
+        else
+        {
+            argv[nargs++] = line;    /* begin of argument string    */
+            /* find end of string */
+            while (*line && (*line != ' ') && (*line != '\t'))
+            {
+                ++line;
+            }
         }
 
         if (*line == '\0')
@@ -342,8 +354,9 @@ int run_command (const char *cmd)
          */
         for (inquotes = 0, sep = str; *sep; sep++)
         {
-            if ((*sep=='\'') &&
-                (*(sep-1) != '\\'))
+            // 双引号也算是转义
+            if (((*sep=='\'') &&  (*(sep-1) != '\\')) ||
+                ((*sep=='\"') &&  (*(sep-1) != '\"')))
                 inquotes=!inquotes;
 
             if (!inquotes &&
